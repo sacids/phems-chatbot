@@ -15,9 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from apps.whatsapp import views
+from apps.whatsapp import views as whatsapp_views
+from apps.telegram import views as telegram_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('message', views.message)
+    path('webhooks/whatsapp/', whatsapp_views.index),
+    path('webhooks/telegram/', telegram_views.index)
 ]
