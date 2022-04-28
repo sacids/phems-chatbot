@@ -40,7 +40,7 @@ class MenuLink(models.Model):
 
     class Meta:
         db_table = 'cb_menu_links'
-        verbose_name_plural = 'Menu Links' 
+        verbose_name_plural = 'Menu Links'     
 
 
 class MenuSession(models.Model):
@@ -67,10 +67,17 @@ def init_menu(channel, phone):
 
     # create menu session
     session = MenuSession()
-    session.channel = channel
-    session.phone = phone
+    session.channel = channel    
     session.code = random_code
     session.menu_id = menu.id
+
+    #check for channel
+    if(channel == 'whatsapp'):
+        session.phone = phone
+    elif(channel == 'telegram'):
+        session.message_id = phone
+
+    #save
     session.save()
 
     # process menu
@@ -110,16 +117,16 @@ def check_menu_link(menu_id, key):
             menu_id=menu_id, sub_menu_id=sub_menu_key[0].id)
 
         if(menu_link):
-            return True
+            return 'NEXT_MENU'
         else:
-            return False
+            return 'INVALID_INPUT'
     else:
         menu_link = MenuLink.objects.filter(menu_id=menu_id)
 
         if(menu_link):
-            return True
+            return 'NEXT_MENU'
         else:
-            return False
+            return 'END_MENU'
 
 #next menu
 def next_menu(channel, phone, uuid, menu_id, key):
@@ -135,9 +142,14 @@ def next_menu(channel, phone, uuid, menu_id, key):
             # create menu session
             session = MenuSession()
             session.channel = channel
-            session.phone = phone
             session.code = uuid
             session.menu_id = menu_link[0].link_id
+            #check for channel
+            if(channel == 'whatsapp'):
+                session.phone = phone
+            elif(channel == 'telegram'):
+                session.message_id = phone
+            #save    
             session.save()
 
             # process menu
@@ -152,9 +164,14 @@ def next_menu(channel, phone, uuid, menu_id, key):
             # create menu session
             session = MenuSession()
             session.channel = channel
-            session.phone = phone
             session.code = uuid
             session.menu_id = menu_link[0].link_id
+            #check for channel
+            if(channel == 'whatsapp'):
+                session.phone = phone
+            elif(channel == 'telegram'):
+                session.message_id = phone
+            #save    
             session.save()
 
             # process menu

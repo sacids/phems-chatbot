@@ -1,4 +1,7 @@
 .env
+.ngrok
+ngrok
+
 
 #Migration files
 */migrations/*

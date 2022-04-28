@@ -7,7 +7,7 @@ from .models import *
 
 # Create your views here.
 @csrf_exempt
-def message(request):
+def index(request):
     user = request.POST.get('From')
     message = request.POST.get('Body')
     print(f'{user} says {message}')
@@ -22,7 +22,10 @@ def message(request):
         # get latest menu session
         m_session = MenuSession.objects.filter(phone=phone, active=0).latest('id')
 
-        if check_menu_link(m_session.menu_id, message):
+        #check menu link
+        menu_response = check_menu_link(m_session.menu_id, message)
+
+        if menu_response == 'NEXT_MENU':
             #update menu session data
             m_session.active = 1
             m_session.values = message
@@ -30,13 +33,16 @@ def message(request):
         
             #call next menu
             result = next_menu('whatsapp', phone, m_session.code, m_session.menu_id, message)
-        else:
+        elif menu_response == 'INVALID_INPUT':
+            #message for invalid input
+            result = {'status': 'success', 'message': "Invalid input"}
+        elif menu_response == 'END_MENU':
             #update menu active = 1
             m_session.active = 1
             m_session.save()
 
             #init menu
-            result = init_menu('whatsapp', phone)
+            result = init_menu('whatsapp', phone)   
     else:
         #init first menu
         result = init_menu('whatsapp', phone)
