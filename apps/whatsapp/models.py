@@ -195,7 +195,7 @@ def process_data(uuid):
 
             menu_value = ''
             if(sub_menu):
-                sub_menu_value = SubMenu.objects.filter(menu_id=menu.id, sequence=menu_session.values)
+                sub_menu_value = SubMenu.objects.filter(menu_id=menu.id, view_id=menu_session.values)
 
                 if(sub_menu_value):
                     menu_value = sub_menu_value[0].title
