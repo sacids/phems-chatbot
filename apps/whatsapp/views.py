@@ -3,6 +3,7 @@ import requests
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from twilio.twiml.messaging_response import MessagingResponse
+from django.db.models import Max
 from .models import *
 
 # Create your views here.
@@ -56,3 +57,22 @@ def index(request):
 
     #return
     return HttpResponse(str(response))
+
+
+#sending data
+def send_data(request):
+    menu_sessions = MenuSession.objects.filter(sent=0).values("code").annotate(Max('id'))
+
+    for val in menu_sessions:
+        #process data
+        data = process_data(val['code'])
+        post_url = '/ems/signal/'
+
+        #post data
+        response = requests.post(post_url, data = data)
+        print(response)
+
+        #todo: update sent = 1
+
+    #browser response
+    return HttpResponse(str('success =>  data sent!'))
