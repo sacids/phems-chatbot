@@ -41,6 +41,8 @@ INSTALLED_APPS = [
 
     #apps
      'apps.whatsapp',
+     'apps.telegram',
+     'apps.api'
 ]
 
 MIDDLEWARE = [
