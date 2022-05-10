@@ -204,9 +204,21 @@ def process_data(uuid):
                 menu_value = menu_session.values
 
             # assign all data to array
-            arr_data[menu.label] = menu_value
+            if menu.label is not None and menu_value is not None:
+                arr_data[menu.label] = menu_value
+
+        #decide contact based on channel
+        contact = ''
+        if menu_sessions[0].channel == 'whatsapp':
+            contact = menu_sessions[0].phone
+        elif  menu_sessions[0].channel == 'telegram':
+            contact = menu_sessions[0].message_id
         #response
-        response = {"channel": "ChatBot", "contents": arr_data}
+        response = {
+            'contents': arr_data, 
+            'channel': menu_sessions[0].channel.upper(), 
+            'contact': contact
+        }
         return response
     else:
         return []

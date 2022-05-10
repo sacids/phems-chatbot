@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class TelegramConfig(AppConfig):
+class ApiConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.telegram'
+    name = 'apps.api'
