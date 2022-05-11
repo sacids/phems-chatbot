@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from apps.whatsapp.models import *
 from django.db.models import Max
 
-BASE_URL = 'http://41.73.194.139:8000'
+API_BASE_URL = 'http://41.73.194.139:8000'
 
 #sending data
 def send_data(request):
@@ -13,12 +13,10 @@ def send_data(request):
     for val in menu_sessions:
         #process data
         payload = process_data(val['code'])
+        print(payload)
 
         #post data
-        post_url = BASE_URL + '/ems/api/signal/'
-        headers = {"Content-Type": "application/json; charset=utf-8"}
-
-        response = requests.post(post_url, data = json.dumps(payload), headers=headers)
+        response = requests.post(f"{API_BASE_URL}/ems/api/signal", data = json.dumps(payload), headers={"Content-Type": "application/json; charset=utf-8"})
         print(response.json)
 
         #update sent = 1
