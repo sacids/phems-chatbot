@@ -20,7 +20,7 @@ from apps.telegram import views as telegram_views
 from apps.api import views as api_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('', admin.site.urls),
     path('webhooks/whatsapp/', whatsapp_views.index),
     path('webhooks/telegram/', telegram_views.index),
     path('send_data/', api_views.send_data)
