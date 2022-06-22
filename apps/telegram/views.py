@@ -3,6 +3,7 @@ import requests
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from apps.whatsapp.models import *
+from apps.whatsapp.utils import *
 
 TELEGRAM_URL="https://api.telegram.org/bot"
 BOT_TOKEN="5210813918:AAEB0WKoRdQ8R3dMPVYXNmnS-4HwhtG8Ov4"
@@ -39,6 +40,12 @@ def index(request):
         
             #call next menu
             result = next_menu('telegram', t_chat["id"], m_session.code, m_session.menu_id, message)
+            post_data = json.loads(result.content)
+
+            #check for post url = None
+            if(post_data['postURL'] is not None):
+                send_data(m_session.code, post_data['postURL'])
+
         elif menu_response == 'INVALID_INPUT':
             #message for invalid input
             result = {'status': 'success', 'message': "Invalid input"}

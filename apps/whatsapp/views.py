@@ -3,8 +3,9 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from twilio.twiml.messaging_response import MessagingResponse
 from .models import *
+from .utils import *
 
-# Create your views here.
+
 @csrf_exempt
 def index(request):
     user = request.POST.get('From')
@@ -32,6 +33,12 @@ def index(request):
         
             #call next menu
             result = next_menu('whatsapp', phone, m_session.code, m_session.menu_id, message)
+            post_data = json.loads(result.content)
+            
+            #check for post url = None
+            if(post_data['postURL'] is not None):
+                send_data(m_session.code, post_data['postURL'])
+
         elif menu_response == 'INVALID_INPUT':
             #message for invalid input
             result = {'status': 'success', 'message': "Invalid input"}
@@ -42,7 +49,7 @@ def index(request):
 
             #init menu
             result = init_menu('whatsapp', phone)   
-    else:
+    else:  
         #init first menu
         result = init_menu('whatsapp', phone)
 
