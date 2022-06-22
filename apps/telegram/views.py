@@ -1,12 +1,13 @@
 import json
 import requests
+from decouple import config
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from apps.whatsapp.models import *
 from apps.whatsapp.utils import *
 
 TELEGRAM_URL="https://api.telegram.org/bot"
-BOT_TOKEN="5210813918:AAEB0WKoRdQ8R3dMPVYXNmnS-4HwhtG8Ov4"
+BOT_TOKEN=config('TELEGRAM_BOT_TOKEN')
 
 # Create your views here.
 @csrf_exempt
