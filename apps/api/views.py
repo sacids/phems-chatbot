@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from apps.whatsapp.utils import *
 from django.db.models import Max
 
-API_BASE_URL = 'http://dev.orangine.co.tz'
+API_BASE_URL = 'https://dev.sacids.org'
 
 #sending data
 def send_data(request):
