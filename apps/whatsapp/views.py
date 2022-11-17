@@ -70,15 +70,15 @@ def index(request):
 #facebook webhooks
 @csrf_exempt
 def facebook(request):
-    mode = request.POST.get('hub_mode')
-    challenge = request.POST.get('hub_challenge')
-    token = request.POST.get('hub_verify_token')
+    mode = request.GET.get('hub_mode')
+    challenge = request.GET.get('hub_challenge')
+    token = request.GET.get('hub_verify_token')
     print(f'{mode} {challenge} {token}')
 
     if (mode and token):
       if (mode == "subscribe" and token == FACEBOOK_TOKEN):
         print(challenge)
-        return challenge
+        return HttpResponse(challenge)
       else:
         return HttpResponse({'error': False, 'message': "webhook not verified"})
 
