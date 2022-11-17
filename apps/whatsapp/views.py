@@ -7,6 +7,7 @@ from .models import *
 from .utils import *
 
 ACCESS_TOKEN ='EAAFLn31liucBAIVv3Mlf9lXYNYAPyfUv32yyuoySP5QkZAWrSiYM9ZB0IabvBrKvEYvXesgoCUXBoNqKZAXAEpYlUS7MUEdDelce6H2tZBi2a2pgRkvxfeQTFH7p3YjICr34TIbzHZBiZBDwNJh9XQ1aMj0oZBZBSKIT6ZBck2o2mOO70H7Yvupst'
+FACEBOOK_TOKEN = "21@sacids"
 
 @csrf_exempt
 def index(request):
@@ -69,7 +70,17 @@ def index(request):
 #facebook webhooks
 @csrf_exempt
 def facebook(request):
-    return HttpResponse({'error': False})
+    mode = request.POST.get('hub_mode')
+    challenge = request.POST.get('hub_challenge')
+    token = request.POST.get('hub_verify_token')
+    print(f'{mode} {challenge} {token}')
+
+    if (mode and token):
+      if (mode == "subscribe" and token == FACEBOOK_TOKEN):
+        print(challenge)
+        return challenge
+      else:
+        return HttpResponse({'error': False, 'message': "webhook not verified"})
 
 #privacy policy
 def privacy_policy(request):
