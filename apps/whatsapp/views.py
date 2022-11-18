@@ -25,8 +25,13 @@ def facebook(request):
     
     # Do anything with the response
     # Sending a message to a phone number to confirm the webhook is working
+    client.send_template_message(
+        template_name="hello_world",
+        language_code="en_US",
+        phone_number="255717705746",
+    )
 
-    return HttpResponse({"status": "success", "response": response}, 200)
+    return HttpResponse({"status": "success"}, 200)
 
 
 @csrf_exempt

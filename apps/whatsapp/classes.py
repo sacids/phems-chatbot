@@ -36,6 +36,25 @@ class WhatsAppWrapper:
         """return response"""
         return response
 
+    def send_text_message(self, template_name, language_code, phone_number):
+        """__summary__: Send templete message """
+        payload = json.dumps({
+            "messaging_product": "whatsapp",
+            "to": phone_number,
+            "type": "template",
+            "template": {
+                "name": template_name,
+                "language": {
+                    "code": language_code
+                }
+            }
+        })
+
+        response = requests.request("POST", f"{self.API_URL}/messages", headers=self.headers, data=payload)
+
+        """return response"""
+        return response
+
 
     def process_webhook_notification(self, data):
         """_summary_: Process webhook notification
