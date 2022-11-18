@@ -5,10 +5,44 @@ from django.views.decorators.csrf import csrf_exempt
 from twilio.twiml.messaging_response import MessagingResponse
 from .models import *
 from .utils import *
+from .classes import WhatsAppWrapper
+from decouple import config
 
-ACCESS_TOKEN ='EAAFLn31liucBAIVv3Mlf9lXYNYAPyfUv32yyuoySP5QkZAWrSiYM9ZB0IabvBrKvEYvXesgoCUXBoNqKZAXAEpYlUS7MUEdDelce6H2tZBi2a2pgRkvxfeQTFH7p3YjICr34TIbzHZBiZBDwNJh9XQ1aMj0oZBZBSKIT6ZBck2o2mOO70H7Yvupst'
-FACEBOOK_TOKEN = "21@sacids"
+VERIFY_TOKEN = config('FACEBOOK_TOKEN')
 
+#facebook webhooks
+@csrf_exempt
+def facebook(request):
+    """__summary__: Get message from the webhook"""
+    if request.method == "GET":
+        if request.GET.get('hub.verify_token') == VERIFY_TOKEN:
+            return request.GET.get('hub.challenge')
+        return "Authentication failed. Invalid Token."
+
+    client = WhatsAppWrapper()
+
+    response = client.process_webhook_notification(request.get_json())
+    
+    # Do anything with the response
+    # Sending a message to a phone number to confirm the webhook is working
+
+    return HttpResponse({"status": "success", "response": response}, 200)
+
+
+@csrf_exempt
+def send_template_message(request):
+    """__summary__: Send template message"""
+    client = WhatsAppWrapper()
+
+    response = client.send_template_message(
+        template_name="hello_world",
+        language_code="en_US",
+        phone_number="255717705746",
+    )
+    
+    return HttpResponse({'error': False, 'response': response})
+
+    
 @csrf_exempt
 def index(request):
     user = request.POST.get('From')
@@ -66,20 +100,6 @@ def index(request):
     #return
     return HttpResponse(str(response))
 
-
-#facebook webhooks
-@csrf_exempt
-def facebook(request):
-    """__summary__: Get message from the webhook"""
-    mode = request.GET.get('hub.mode')
-    challenge = request.GET.get('hub.challenge')
-    token = request.GET.get('hub.verify_token')
-    print(f'{mode} {challenge} {token}')
-
-    if (token == FACEBOOK_TOKEN):
-        return HttpResponse(challenge)
-    else:
-        return HttpResponse({'error': False, 'message': "webhook not verified"})
 
 #privacy policy
 def privacy_policy(request):

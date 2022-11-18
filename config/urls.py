@@ -22,6 +22,7 @@ from apps.api import views as api_views
 urlpatterns = [
     path('webhooks/whatsapp/', whatsapp_views.index),
     path('webhooks/facebook/', whatsapp_views.facebook),
+    path('webhooks/send-message/', whatsapp_views.send_template_message),
     path('privacy_policy', whatsapp_views.privacy_policy),
     path('webhooks/telegram/', telegram_views.index),
     path('send_data/', api_views.send_data),
