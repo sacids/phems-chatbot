@@ -64,7 +64,6 @@ class WhatsAppWrapper:
         response = []
 
         for entry in data["entry"]:
-
             for change in entry["changes"]:
                 response.append(
                     {

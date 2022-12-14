@@ -17,49 +17,51 @@ def index(request):
     t_chat = t_message["chat"]
     print(f'telegram bot says {t_message}')
 
-    #menu session
+    """menu session"""
     menu_session = MenuSession.objects.filter(message_id=t_chat["id"], active=0)
 
     if menu_session.count() > 0:
-        # get latest menu session
+        """get latest menu session"""
         m_session = MenuSession.objects.filter(message_id=t_chat["id"], active=0).latest('id')
 
-        #check if input == text,photo,video
+        """check if input == text,photo,video"""
         if 'text' in t_message:
             message = t_message['text']
         elif 'photo' in t_message:
             message = t_message['photo']    
 
-        #check menu link
+        """check menu link"""
         menu_response = check_menu_link(m_session.menu_id, message)
 
         if menu_response == 'NEXT_MENU':
-            #update menu session data
+            """update menu session data"""
             m_session.active = 1
             m_session.values = message
             m_session.save()
         
-            #call next menu
+            """call next menu"""
             result = next_menu('telegram', t_chat["id"], m_session.code, m_session.menu_id, message)
             post_data = json.loads(result.content)
 
-            #check for post url = None
+            """check for post url = None"""
             if(post_data['postURL'] is not None):
                 send_data(m_session.code, post_data['postURL'])
 
         elif menu_response == 'INVALID_INPUT':
-            #message for invalid input
-            result = {'status': 'success', 'message': "Invalid input"}
+            """message for invalid input"""
+            result = {'status': 'success', 'message': "Ingizo batili"}
         elif menu_response == 'END_MENU':
-            #update menu active = 1
+            """update menu active = 1 """
             m_session.active = 1
             m_session.save()
 
-            #init menu
+            """init menu"""
             result = init_menu('telegram', t_chat["id"])  
     else:
-        #init first menu
-        result = init_menu('telegram', t_chat["id"])
+        if message.upper() == "START" or message.upper() == "ANZA":
+            result = init_menu('telegram', t_chat["id"])
+        else:
+            result = {'status': 'success', 'message': "Anzisha OHD chat ukitumia neno kuu START au ANZA"}
 
     #data json
     data = json.loads(result.content)

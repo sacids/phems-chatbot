@@ -25,11 +25,6 @@ def facebook(request):
     
     # Do anything with the response
     # Sending a message to a phone number to confirm the webhook is working
-    client.send_template_message(
-        template_name="hello_world",
-        language_code="en_US",
-        phone_number="255717705746",
-    )
 
     return HttpResponse({"status": "success"}, 200)
 
@@ -54,61 +49,63 @@ def index(request):
     message = request.POST.get('Body')
     print(f'{user} says {message}')
 
-    # substring phone
-    phone = user[-12:]
+    """substring phone"""
+    phone = user[-13:]
 
-    #check menu session if active=0
+    """check menu session if active=0"""
     menu_session = MenuSession.objects.filter(phone=phone, active=0)
 
     if menu_session.count() > 0:
-        # get latest menu session
+        """get latest menu session"""
         m_session = MenuSession.objects.filter(phone=phone, active=0).latest('id')
 
-        #check menu link
+        """check menu link"""
         menu_response = check_menu_link(m_session.menu_id, message)
 
         if menu_response == 'NEXT_MENU':
-            #update menu session data
+            """update menu session data"""
             m_session.active = 1
             m_session.values = message
             m_session.save()
         
-            #call next menu
+            """call next menu"""
             result = next_menu('whatsapp', phone, m_session.code, m_session.menu_id, message)
             post_data = json.loads(result.content)
             
-            #check for post url = None
+            """check for post url = None"""
             if(post_data['postURL'] is not None):
                 send_data(m_session.code, post_data['postURL'])
 
         elif menu_response == 'INVALID_INPUT':
-            #message for invalid input
-            result = {'status': 'success', 'message': "Invalid input"}
+            """message for invalid input"""
+            result = {'status': 'success', 'message': "Ingizo batili"}
         elif menu_response == 'END_MENU':
-            #update menu active = 1
+            """update menu active = 1"""
             m_session.active = 1
             m_session.save()
 
-            #init menu
+            """init menu"""
             result = init_menu('whatsapp', phone)   
     else:  
-        #init first menu
-        result = init_menu('whatsapp', phone)
+        if message.upper() == "START" or message.upper() == "ANZA":
+            result = init_menu('whatsapp', phone)
+        else:
+            result = {'status': 'success', 'message': "Anzisha OHD chat ukitumia neno kuu START au ANZA"}
 
-    #data json
+        """init first menu"""
+        
+    """data formarting"""
     data = json.loads(result.content)
 
-    # response
+    """response"""
     response = MessagingResponse()
     response.message(data['message']) 
 
-    #return
     return HttpResponse(str(response))
 
 
-#privacy policy
+"""privacy policy"""
 def privacy_policy(request):
-    #render view
     return render(request, "html/index.html", {})
 
 
