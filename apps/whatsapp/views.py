@@ -50,14 +50,14 @@ def webhook(request):
         timestamp = client.get_message_timestamp(data)
         facebook_id = client.get_messageId(data)
 
-        """substring phone"""
-        phone = from_number[-13:]
-
         if message_type == 'text':
             message = client.get_message(data)
 
             """process thread"""
-            process_threads(from_number=phone, key=message)
+            new_message = process_threads(from_number=from_number, key=message)
+
+            """send message"""
+            response = client.send_text_message(from_number, new_message)
     else:
         delivery = client.get_delivery(data)
         if delivery:
@@ -128,9 +128,13 @@ def process_threads(**kwargs):
             """initiate menu session"""
             message = "Asante kwa kukamilisha usajili wako!"    
     else:
-        """initiate menu session"""
-        message = thread.call_init_menu(phone=from_number, channel="whatsapp") 
+        if key.upper() == "START" or key.upper() == "ANZA":
+            """initiate menu session"""
+            message = thread.call_init_menu(phone=from_number, channel="whatsapp") 
+        else:
+            message = "Anzisha OHD chat ukitumia neno kuu START au ANZA"    
 
+    """return message"""
     return message
 
 
