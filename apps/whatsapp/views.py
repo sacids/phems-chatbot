@@ -5,7 +5,6 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from twilio.twiml.messaging_response import MessagingResponse
 from .models import *
-from .utils import *
 from .classes import WhatsAppWrapper
 from apps.api.thread import ThreadWrapper
 from decouple import config

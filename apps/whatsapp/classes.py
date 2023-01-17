@@ -1,11 +1,7 @@
-import os
-import random
-import string
-import requests
 import json
+import requests
 from django.http import HttpResponse, JsonResponse
 from decouple import config
-from .models import Menu, SubMenu, MenuLink, MenuSession
 
 
 class WhatsAppWrapper:
