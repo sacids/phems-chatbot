@@ -1,4 +1,5 @@
 import json
+import logging
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -6,102 +7,146 @@ from twilio.twiml.messaging_response import MessagingResponse
 from .models import *
 from .utils import *
 from .classes import WhatsAppWrapper
+from apps.api.thread import ThreadWrapper
 from decouple import config
 
 VERIFY_TOKEN = config('FACEBOOK_TOKEN')
 
-#facebook webhooks
 @csrf_exempt
-def facebook(request):
-    """__summary__: Get message from the webhook"""
+def verification(request):
+    """__summary__: verification of webhook"""
     if request.method == "GET":
         if request.GET.get('hub.verify_token') == VERIFY_TOKEN:
             return request.GET.get('hub.challenge')
         return "Authentication failed. Invalid Token."
-
-    client = WhatsAppWrapper()
-
-    response = client.process_webhook_notification(request.get_json())
     
     # Do anything with the response
     # Sending a message to a phone number to confirm the webhook is working
 
     return HttpResponse({"status": "success"}, 200)
 
-
 @csrf_exempt
-def send_template_message(request):
-    """__summary__: Send template message"""
+def webhook(request):
+    """__summary__: Get message from the webhook"""
     client = WhatsAppWrapper()
 
-    response = client.send_template_message(
-        template_name="hello_world",
-        language_code="en_US",
-        phone_number="255717705746",
-    )
-    
-    return HttpResponse({'error': False, 'response': response})
+    data = request.get_json()
+    logging.info("Received webhook data: %s", data)
 
-    
-@csrf_exempt
-def index(request):
-    user = request.POST.get('From')
-    message = request.POST.get('Body')
-    print(f'{user} says {message}')
+    """extract => field, from, key, message_type"""
+    field = data["entry"][0]["changes"][0]["field"]
 
-    """substring phone"""
-    phone = user[-13:]
+    """check if field not messages and reply 400 response"""
+    if field != 'messages':
+        return HttpResponse(400)
 
-    """check menu session if active=0"""
-    menu_session = MenuSession.objects.filter(phone=phone, active=0)
+    """new message"""
+    new_message = client.get_mobile(data)
+
+    if new_message:
+        from_number = client.get_mobile(data)
+        profile_name = client.get_profile_name(data)
+        message_type = client.get_message_type(data)
+        timestamp = client.get_message_timestamp(data)
+        facebook_id = client.get_messageId(data)
+
+        """substring phone"""
+        phone = from_number[-13:]
+
+        if message_type == 'text':
+            message = client.get_message(data)
+
+            """process thread"""
+            process_threads(from_number=phone, key=message)
+    else:
+        delivery = client.get_delivery(data)
+        if delivery:
+            print(f"Message : {delivery}")
+        else:
+            print("No new message")
+
+    """return response to facebook"""
+    return request.get_json()
+
+def process_threads(**kwargs):
+    """process all the threads"""
+    from_number = kwargs['from_number']
+    key         = kwargs['key']
+
+    """initiate message"""
+    message = ""
+
+    """thread wrapper"""
+    thread = ThreadWrapper()
+
+    """Follow menu session and Trigger follow up menu"""
+    menu_session = MenuSession.objects.filter(phone=from_number, active=0) 
 
     if menu_session.count() > 0:
-        """get latest menu session"""
-        m_session = MenuSession.objects.filter(phone=phone, active=0).latest('id')
-
-        """check menu link"""
-        menu_response = check_menu_link(m_session.menu_id, message)
+        m_session = MenuSession.objects.filter(phone=from_number, active=0).latest('id')
+        menu_response = thread.check_menu_link(m_session.menu_id, key) 
 
         if menu_response == 'NEXT_MENU':
-            """update menu session data"""
+            """update menu session"""
             m_session.active = 1
-            m_session.values = message
+            m_session.values = key
             m_session.save()
-        
-            """call next menu"""
-            result = next_menu('whatsapp', phone, m_session.code, m_session.menu_id, message)
-            post_data = json.loads(result.content)
-            
-            """check for post url = None"""
-            if(post_data['postURL'] is not None):
-                send_data(m_session.code, post_data['postURL'])
+
+            """update data """
+            OD_uuid = m_session.code
+            OD_menu_id = m_session.menu_id
+
+            """result"""
+            result = thread.next_menu(phone=from_number, uuid=OD_uuid, menu_id=OD_menu_id, key=key, channel="whatsapp")
+            data = json.loads(result.content)
+
+            """message"""
+            message = data['message']
+
+            """check for action = None"""
+            if(data['action'] is not None):
+                if data['action'] == 'create':
+                    """update all menu session"""
+                    m_session.active = 1
+                    m_session.save()
+
+                    """process data"""
+                    response = thread.process_data(uuid=OD_uuid)
+                    my_data = json.loads(response.content)
+                    print(my_data)
+                    result = push_data(payload=my_data)
 
         elif menu_response == 'INVALID_INPUT':
-            """message for invalid input"""
-            result = {'status': 'success', 'message': "Ingizo batili"}
+            """invalid input"""
+            message = "Chagua batili, tafadhali chagua tena!"
+
         elif menu_response == 'END_MENU':
-            """update menu active = 1"""
+            """update and end menu session"""
             m_session.active = 1
             m_session.save()
 
-            """init menu"""
-            result = init_menu('whatsapp', phone)   
-    else:  
-        if message.upper() == "START" or message.upper() == "ANZA":
-            result = init_menu('whatsapp', phone)
-        else:
-            result = {'status': 'success', 'message': "Anzisha OHD chat ukitumia neno kuu START au ANZA"}
+            """initiate menu session"""
+            message = "Asante kwa kukamilisha usajili wako!"    
+    else:
+        """initiate menu session"""
+        message = thread.call_init_menu(phone=from_number, channel="whatsapp") 
 
-        """init first menu"""
+    return message
+
+
+def push_data(**kwargs):
+    """push data to external API"""
+    payload = kwargs['payload']
+
+    """base url"""
+    baseURL = "https://dev.sacids.org/ems/api/signal/"
+
+    """push data"""
+    response = requests.post(f"{baseURL}", data = json.dumps(payload), headers={"Content-Type": "application/json; charset=utf-8"})
+    print(response.json())
         
-    """data formarting"""
-    data = json.loads(result.content)
-
     """response"""
-    response = MessagingResponse()
-    response.message(data['message']) 
-
-    return HttpResponse(str(response))
+    return JsonResponse({'status': 'success', 'message': "data sent"})
 
 
 """privacy policy"""
