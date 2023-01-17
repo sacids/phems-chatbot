@@ -6,9 +6,9 @@ class Menu(models.Model):
     title       =  models.TextField(blank=False, null=False)
     flag        =  models.CharField(max_length=50, blank=False, null=False)
     label       =  models.CharField(max_length=50, blank=True, null=True)
-    verify      =  models.IntegerField(default=0, null=False)
-    url         =  models.URLField(blank=True, null=True)
-    post_url    =  models.URLField(blank=True, null=True)
+    pull        =  models.IntegerField(default=0, null=False)
+    url         =  models.CharField(max_length=50, blank=True, null=True)
+    action      =  models.CharField(max_length=20, blank=True, null=True)
 
     class Meta:
         db_table = 'cb_menus'
@@ -45,9 +45,9 @@ class MenuLink(models.Model):
 class MenuSession(models.Model):
     code        =  models.CharField(max_length=100, blank=True, null=True)
     phone       =  models.CharField(max_length=100, blank=True, null=True)
-    message_id  =  models.CharField(max_length=100, blank=True, null=True)
     channel     =  models.CharField(max_length=100, blank=False, null=False, default='whatsapp')  
     menu        =  models.ForeignKey(Menu, on_delete=models.CASCADE)
+    flag        =  models.CharField(max_length=100, blank=True, null=True)
     values      =  models.TextField(blank=True, null=True)
     active      =  models.IntegerField(blank=False, null=False, default=0)
     sent        =  models.IntegerField(blank=False, null=False, default=0)

@@ -1,10 +1,12 @@
 import json
+import logging
 import requests
 from decouple import config
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from apps.whatsapp.models import *
-from apps.whatsapp.utils import *
+from .classes import TelegramWrapper
+from apps.api.thread import ThreadWrapper
 
 TELEGRAM_URL="https://api.telegram.org/bot"
 BOT_TOKEN=config('TELEGRAM_BOT_TOKEN')
@@ -12,69 +14,113 @@ BOT_TOKEN=config('TELEGRAM_BOT_TOKEN')
 # Create your views here.
 @csrf_exempt
 def index(request):
+    """__summary__: Get message from the webhook"""
+    client = TelegramWrapper()
+
+    """data from Telegram"""
     t_data = json.loads(request.body)
     t_message = t_data["message"]
     t_chat = t_message["chat"]
+
     print(f'telegram bot says {t_message}')
+    
+    """message type"""
+    message_type = client.get_message_type(t_message)
 
-    #menu session
-    menu_session = MenuSession.objects.filter(message_id=t_chat["id"], active=0)
+    if message_type == 'text':
+        message = client.get_message(t_message)
+        from_number = t_chat["id"]
 
-    if menu_session.count() > 0:
-        # get latest menu session
-        m_session = MenuSession.objects.filter(message_id=t_chat["id"], active=0).latest('id')
+        """process thread"""
+        new_message = process_threads(from_number=from_number, key=message)
 
-        #check if input == text,photo,video
-        if 'text' in t_message:
-            message = t_message['text']
-        elif 'photo' in t_message:
-            message = t_message['photo']    
+        """send message"""
+        response = client.send_text_message(from_number, new_message)
 
-        #check menu link
-        menu_response = check_menu_link(m_session.menu_id, message)
-
-        if menu_response == 'NEXT_MENU':
-            #update menu session data
-            m_session.active = 1
-            m_session.values = message
-            m_session.save()
-        
-            #call next menu
-            result = next_menu('telegram', t_chat["id"], m_session.code, m_session.menu_id, message)
-            post_data = json.loads(result.content)
-
-            #check for post url = None
-            if(post_data['postURL'] is not None):
-                send_data(m_session.code, post_data['postURL'])
-
-        elif menu_response == 'INVALID_INPUT':
-            #message for invalid input
-            result = {'status': 'success', 'message': "Invalid input"}
-        elif menu_response == 'END_MENU':
-            #update menu active = 1
-            m_session.active = 1
-            m_session.save()
-
-            #init menu
-            result = init_menu('telegram', t_chat["id"])  
-    else:
-        #init first menu
-        result = init_menu('telegram', t_chat["id"])
-
-    #data json
-    data = json.loads(result.content)
-
-    # send sms
-    send_message(data['message'], t_chat["id"])
-
-    # response
+    """return response"""
     return JsonResponse({"ok": "POST request processed"})
 
-#send message
-def send_message(message, chat_id):
-    data = {
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "Markdown",
-    }
-    response = requests.post(f"{TELEGRAM_URL}{BOT_TOKEN}/sendMessage", data=data)
+
+def process_threads(**kwargs):
+    """process all the threads"""
+    from_number = kwargs['from_number']
+    key         = kwargs['key']
+
+    """initiate message"""
+    message = ""
+
+    """thread wrapper"""
+    thread = ThreadWrapper()
+
+    """Follow menu session and Trigger follow up menu"""
+    menu_session = MenuSession.objects.filter(phone=from_number, active=0) 
+
+    if menu_session.count() > 0:
+        m_session = MenuSession.objects.filter(phone=from_number, active=0).latest('id')
+        menu_response = thread.check_menu_link(m_session.menu_id, key) 
+
+        if menu_response == 'NEXT_MENU':
+            """update menu session"""
+            m_session.active = 1
+            m_session.values = key
+            m_session.save()
+
+            """update data """
+            OD_uuid = m_session.code
+            OD_menu_id = m_session.menu_id
+
+            """result"""
+            result = thread.next_menu(phone=from_number, uuid=OD_uuid, menu_id=OD_menu_id, key=key, channel="telegram")
+            data = json.loads(result.content)
+
+            """message"""
+            message = data['message']
+
+            """check for action = None"""
+            if(data['action'] is not None):
+                if data['action'] == 'create':
+                    """update all menu session"""
+                    m_session.active = 1
+                    m_session.save()
+
+                    """process data"""
+                    response = thread.process_data(uuid=OD_uuid)
+                    my_data = json.loads(response.content)
+                    print(my_data)
+                    result = push_data(payload=my_data)
+
+        elif menu_response == 'INVALID_INPUT':
+            """invalid input"""
+            message = "Chagua batili, tafadhali chagua tena!"
+
+        elif menu_response == 'END_MENU':
+            """update and end menu session"""
+            m_session.active = 1
+            m_session.save()
+
+            """initiate menu session"""
+            message = "Asante kwa kukamilisha usajili wako!"    
+    else:
+        if key.upper() == "START" or key.upper() == "ANZA":
+            """initiate menu session"""
+            message = thread.call_init_menu(phone=from_number, channel="telegram") 
+        else:
+            message = "Anzisha OHD chat ukitumia neno kuu START au ANZA"    
+
+    """return message"""
+    return message
+
+
+def push_data(**kwargs):
+    """push data to external API"""
+    payload = kwargs['payload']
+
+    """base url"""
+    baseURL = "https://dev.sacids.org/ems/api/signal/"
+
+    """push data"""
+    response = requests.post(f"{baseURL}", data = json.dumps(payload), headers={"Content-Type": "application/json; charset=utf-8"})
+    print(response.json())
+        
+    """response"""
+    return JsonResponse({'status': 'success', 'message': "data sent"})
