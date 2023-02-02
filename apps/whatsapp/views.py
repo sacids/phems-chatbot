@@ -10,7 +10,7 @@ from .classes import WhatsAppWrapper
 from apps.api.thread import ThreadWrapper
 from decouple import config
 
-VERIFY_TOKEN = config('FACEBOOK_TOKEN')
+VERIFY_TOKEN = "21@Kitimoto"
 
 @csrf_exempt
 def verification(request):
@@ -27,6 +27,12 @@ def verification(request):
 
 @csrf_exempt
 def webhook(request):
+    """__summary__: verification of webhook"""
+    if request.method == "GET":
+        if request.GET.get('hub.verify_token') == VERIFY_TOKEN:
+            return request.GET.get('hub.challenge')
+        return "Authentication failed. Invalid Token."
+
     """__summary__: Get message from the webhook"""
     client = WhatsAppWrapper()
 
