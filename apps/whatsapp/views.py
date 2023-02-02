@@ -12,16 +12,26 @@ from decouple import config
 
 VERIFY_TOKEN = "21@Kitimoto"
 
+#facebook webhooks
 @csrf_exempt
-def verification(request):
-    """__summary__: verification of webhook"""
+def facebook(request):
+    """__summary__: Get message from the webhook"""
     if request.method == "GET":
         if request.GET.get('hub.verify_token') == VERIFY_TOKEN:
             return request.GET.get('hub.challenge')
         return "Authentication failed. Invalid Token."
+
+    client = WhatsAppWrapper()
+
+    #response = client.process_webhook_notification(request.get_json())
     
     # Do anything with the response
     # Sending a message to a phone number to confirm the webhook is working
+    client.send_template_message(
+        template_name="hello_world",
+        language_code="en_US",
+        phone_number="255717705746",
+    )
 
     return HttpResponse({"status": "success"}, 200)
 
