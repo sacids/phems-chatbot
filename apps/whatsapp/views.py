@@ -1,6 +1,7 @@
 import json
 import logging
-from django.http import HttpResponse
+import requests
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from twilio.twiml.messaging_response import MessagingResponse
@@ -142,7 +143,7 @@ def push_data(**kwargs):
     payload = kwargs['payload']
 
     """base url"""
-    baseURL = "https://dev.sacids.org/ems/api/signal/"
+    baseURL = "https://afyadata.sacids.org/api/v3/chatbot"
 
     """push data"""
     response = requests.post(f"{baseURL}", data = json.dumps(payload), headers={"Content-Type": "application/json; charset=utf-8"})
