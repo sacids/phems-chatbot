@@ -12,6 +12,25 @@ from decouple import config
 
 VERIFY_TOKEN = "21@Kitimoto"
 
+@csrf_exempt
+def twillio(request):
+    user = request.POST.get('From')
+    message = request.POST.get('Body')
+    print(f'{user} says {message}')
+
+    """substring phone"""
+    from_number = user[-12:]
+
+    """process thread"""
+    new_message = process_threads(from_number=from_number, key=message)
+
+    """response"""
+    response = MessagingResponse()
+    response.message(new_message) 
+
+    """return response"""
+    return HttpResponse(str(response))
+
 #facebook webhooks
 @csrf_exempt
 def facebook(request):
@@ -21,28 +40,10 @@ def facebook(request):
             return request.GET.get('hub.challenge')
         return "Authentication failed. Invalid Token."
 
-    client = WhatsAppWrapper()
-
-    #response = client.process_webhook_notification(request.get_json())
-    
-    # Do anything with the response
-    # Sending a message to a phone number to confirm the webhook is working
-    client.send_template_message(
-        template_name="hello_world",
-        language_code="en_US",
-        phone_number="255717705746",
-    )
-
     return HttpResponse({"status": "success"}, 200)
 
 @csrf_exempt
 def webhook(request):
-    """__summary__: verification of webhook"""
-    if request.method == "GET":
-        if request.GET.get('hub.verify_token') == VERIFY_TOKEN:
-            return request.GET.get('hub.challenge')
-        return "Authentication failed. Invalid Token."
-
     """__summary__: Get message from the webhook"""
     client = WhatsAppWrapper()
 
