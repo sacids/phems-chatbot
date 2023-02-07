@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #apps
+     'apps.thread',
      'apps.whatsapp',
      'apps.telegram',
      'apps.api'
