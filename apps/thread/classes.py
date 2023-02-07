@@ -176,8 +176,6 @@ class ThreadWrapper:
 
     def process_data(self, **kwargs):
         """Process data for processing"""
-
-        """args"""
         uuid  = kwargs["uuid"]
 
         """thread sessions"""
