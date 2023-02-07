@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OHD Chatbot | {{ heading }}</title>
+
+    <!-- App favicon -->
+    <link rel="icon" type="image/png" href="{% static 'img/CoatofArms_Lg.png' %}">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <!--./alpine js -->
+    <script defer src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js"></script>
+
+    <!-- htmx -->
+    <script src="https://unpkg.com/htmx.org@1.8.5"
+        integrity="sha384-7aHh9lqPYGYZ7sTHvzP1t3BAfLhYSTy9ArHdP3Xsr9/3TlGurYgcPBoFmXX2TX/w"
+        crossorigin="anonymous"></script>
+
+    <!--./fontawesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+        integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!--./jquery -->
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+        integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+
+    <!-- Select JS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+    {% block extra_css %}
+    <link href="{% static 'css/table.css' %}" rel="stylesheet" type="text/css" />
+    {% endblock %}
+</head>
+
+<body>
+    <!-- Begin page -->
+    <div class="h-screen flex flex-col text-slate-700">
+        <div class="">
+            {% include 'partials/header.html' %}
+        </div>
+
+        <div class="flex flex-col h-full overflow-hidden">
+            {% block contents %}{% endblock %}
+        </div>
+    </div>
+
+    {% block extrajs %}{% endblock %}
+
+    <script>
+        let dataTable = $('#dt').DataTable({
+            "paging": false,
+            "ordering": true,
+            "info": true,
+            "bFilter": true,
+            "pageLength": 100,
+            "dom": "lrtip" //to hide default search box but search feature is not disabled
+        });
+
+        $('#myCustomSearchBox').keyup(function () {
+            dataTable.search($(this).val())
+                .draw(); // this  is for customized searchbox with datatable search feature.
+        });
+
+        $(document).ready(function () {
+            $('#thread_id').on('change', function (e) {
+                thread_id = $(this).val();
+                baseURL = window.location.origin;
+
+                $.ajax({
+                    url: baseURL + '/threads/get-lists/' + thread_id,
+                    type: "get",
+                    success: function (data) {
+                        $('#sub_thread_id').html(data);
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

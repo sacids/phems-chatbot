@@ -1,0 +1,86 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load humanize %}
+{% load crispy_forms_field %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+{% block heading %} Update Thread {% endblock %}
+
+{% block contents %}
+
+<main class="bg-white h-full relative">
+    <div class="w-full h-full overflow-y-scroll">
+        <div class="bg-gray-100">
+            <div class="mx-12 py-2 px-4 sm:px-6 lg:px-8">
+                <h1 class="text-xl font-medium tracking-tight text-gray-900">Edit Thread</h1>
+            </div>
+        </div>
+
+        <div class="mx-auto py-4 px-4 sm:px-6 lg:px-8">
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="mt-2 alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="mx-48">
+                {% csrf_token %}
+
+                <div class="flex flex-wrap -mx-3 mb-3">
+                    <div class="w-full md:w-full px-3 text-sm font-medium">
+                        {{ form.step|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap -mx-3 mb-3">
+                    <div class="w-full md:w-full px-3 text-sm font-medium">
+                        {{ form.title|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap -mx-3 mb-3">
+                    <div class="w-full md:w-1/2 px-3 text-sm font-medium">
+                        {{ form.flag|as_crispy_field }}
+                    </div>
+
+                    <div class="w-full md:w-1/2 px-3">
+                        {{ form.label|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap -mx-3 mb-3">
+                    <div class="w-full md:w-1/4 px-3 text-sm font-medium">
+                        {{ form.pull|as_crispy_field }}
+                    </div>
+
+                    <div class="w-full md:w-3/4 px-3 text-sm font-medium">
+                        {{ form.url|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap -mx-3 mb-3">
+                    <div class="w-full md:w-1/4 px-3 text-sm font-medium">
+                        {{ form.action|as_crispy_field }}
+                    </div>
+
+                    <div class="w-full md:w-3/4 px-3 text-sm font-medium">
+                        {{ form.action_url|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <a href="{% url 'threads:lists' %}"
+                                class="text-white bg-red-800 hover:bg-red-900 focus:ring-4 font-medium rounded text-sm w-full sm:w-auto px-5 py-2.5 text-center mr-2">Cancel</a>
+                    <button type="submit" class="text-white bg-slate-700 hover:bg-slate-900 focus:ring-4 font-medium rounded text-sm w-full sm:w-auto px-5 py-2.5 text-center">Update</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</main>
+
+{% endblock %}

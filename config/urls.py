@@ -14,13 +14,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from apps.whatsapp import views as whatsapp_views
 from apps.telegram import views as telegram_views
 from apps.api import views as api_views
 
 urlpatterns = [
-    path('', admin.site.urls),
+    path('', include('apps.account.urls')),
+    path('accounts/', include('apps.account.urls')),
+    path('admin', admin.site.urls),
+    path('threads/', include('apps.thread.urls')),
+
     # path('webhooks/twillio/', whatsapp_views.twillio),
     path('webhooks/facebook/', whatsapp_views.facebook),
     path('webhooks/telegram/', telegram_views.index),

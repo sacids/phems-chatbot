@@ -9,6 +9,7 @@ class Thread(models.Model):
         ('CREATE', 'CREATE'),
     )
 
+    step        =  models.CharField(max_length=5, blank=True, null=True)
     title       =  models.TextField(blank=False, null=False)
     flag        =  models.CharField(max_length=50, blank=False, null=False)
     label       =  models.CharField(max_length=50, blank=True, null=True)

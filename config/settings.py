@@ -38,12 +38,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
+
+    'crispy_forms',
 
     #apps
-     'apps.thread',
-     'apps.whatsapp',
-     'apps.telegram',
-     'apps.api'
+    'apps.account',
+    'apps.thread',
+    'apps.whatsapp',
+    'apps.telegram',
+    'apps.api'
 ]
 
 MIDDLEWARE = [
@@ -61,7 +65,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -123,11 +127,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-# STATICFILES_DIRS = [
-#     "assets",
-# ]
+STATICFILES_DIRS = [
+    "assets",
+]
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+# media url
+MEDIA_ROOT = str(BASE_DIR / "assets/")
+MEDIA_URL = "/assets/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
