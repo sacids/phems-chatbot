@@ -6,7 +6,6 @@ import json
 from django.http import HttpResponse, JsonResponse
 from .models import *
 
-
 class ThreadWrapper:
     """class control all the thread in the chatbot"""
     #BASE_URL   = "http://127.0.0.1:8000/"
@@ -175,41 +174,41 @@ class ThreadWrapper:
         return session.id
 
 
-    # def process_data(self, **kwargs):
-    #     """Process data for processing"""
+    def process_data(self, **kwargs):
+        """Process data for processing"""
 
-    #     """args"""
-    #     uuid  = kwargs["uuid"]
+        """args"""
+        uuid  = kwargs["uuid"]
 
-    #     """menu sessions"""
-    #     menu_sessions = MenuSession.objects.filter(code=uuid)
+        """thread sessions"""
+        thread_sessions = ThreadSession.objects.filter(uuid=uuid)
 
-    #     if menu_sessions:
-    #         arr_data = {}
-    #         for menu_session in menu_sessions:
-    #             menu = Menu.objects.get(pk=menu_session.menu_id)
-    #             sub_menu = SubMenu.objects.filter(menu_id=menu.id)
+        if thread_sessions:
+            arr_data = {}
+            for t_session in thread_sessions:
+                thread = Thread.objects.get(pk=t_session.thread_id)
+                sub_thread = SubThread.objects.filter(thread_id=thread.id)
 
-    #             menu_value = ''
-    #             if sub_menu:
-    #                 sub_menu_value = SubMenu.objects.filter(menu_id=menu.id, view_id=menu_session.values).first()
+                thread_value = ''
+                if sub_thread:
+                    sub_thread_value = SubThread.objects.filter(thread_id=thread.id, view_id=t_session.values).first()
 
-    #                 if sub_menu_value:
-    #                     menu_value = sub_menu_value.title
-    #             else:
-    #                 menu_value = menu_session.values
+                    if sub_thread_value:
+                        thread_value = sub_thread_value.title
+                else:
+                    thread_value = t_session.values
 
-    #             """assign all data to array"""
-    #             if menu.label is not None and menu_value is not None:
-    #                 arr_data[menu.label] = menu_value
+                """assign all data to array"""
+                if thread.label is not None and thread_value is not None:
+                    arr_data[thread.label] = thread_value
 
-    #         response = {
-    #             'contents': arr_data, 
-    #             'channel': menu_sessions[0].channel.upper(), 
-    #             'contact': menu_sessions[0].phone
-    #         }
+            response = {
+                'contents': arr_data, 
+                'channel': thread_sessions[0].channel.upper(), 
+                'contact': thread_sessions[0].phone
+            }
 
-    #         """response"""
-    #         return response
-    #     else:
-    #         return []
+            """response"""
+            return response
+        else:
+            return []

@@ -5,31 +5,12 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from twilio.twiml.messaging_response import MessagingResponse
-from .models import *
 from .classes import WhatsAppWrapper
-from apps.api.thread import ThreadWrapper
+from apps.thread.classes import ThreadWrapper
+from apps.thread.models import *
 from decouple import config
 
-VERIFY_TOKEN = "21@Kitimoto"
-
-@csrf_exempt
-def twillio(request):
-    user = request.POST.get('From')
-    message = request.POST.get('Body')
-    print(f'{user} says {message}')
-
-    """substring phone"""
-    from_number = user[-12:]
-
-    """process thread"""
-    new_message = process_threads(from_number=from_number, key=message)
-
-    """response"""
-    response = MessagingResponse()
-    response.message(new_message) 
-
-    """return response"""
-    return HttpResponse(str(response))
+VERIFY_TOKEN = config('WHATSAPP_VERIFY_TOKEN')
 
 #facebook webhooks
 @csrf_exempt
@@ -85,6 +66,7 @@ def webhook(request):
     """return response to facebook"""
     return request.get_json()
 
+
 def process_threads(**kwargs):
     """process all the threads"""
     from_number = kwargs['from_number']
@@ -94,27 +76,27 @@ def process_threads(**kwargs):
     message = ""
 
     """thread wrapper"""
-    thread = ThreadWrapper()
+    client = ThreadWrapper()
 
-    """Follow menu session and Trigger follow up menu"""
-    menu_session = MenuSession.objects.filter(phone=from_number, active=0) 
+    """Follow thread session and Trigger follow up menu"""
+    thread_session = ThreadSession.objects.filter(phone=from_number, active=0) 
 
-    if menu_session.count() > 0:
-        m_session = MenuSession.objects.filter(phone=from_number, active=0).latest('id')
-        menu_response = thread.check_menu_link(m_session.menu_id, key) 
+    if thread_session.count() > 0:
+        m_session = ThreadSession.objects.filter(phone=from_number, active=0).latest('id')
+        thread_response = client.check_thread_link(m_session.thread_id, key) 
 
-        if menu_response == 'NEXT_MENU':
-            """update menu session"""
+        if thread_response == 'NEXT_MENU':
+            """update thread session"""
             m_session.active = 1
             m_session.values = key
             m_session.save()
 
             """update data """
-            OD_uuid = m_session.code
-            OD_menu_id = m_session.menu_id
+            OD_uuid = m_session.uuid
+            OD_thread_id = m_session.thread_id
 
             """result"""
-            result = thread.next_menu(phone=from_number, uuid=OD_uuid, menu_id=OD_menu_id, key=key, channel="whatsapp")
+            result = client.next_thread(phone=from_number, uuid=OD_uuid, thread_id=OD_thread_id, key=key, channel="WHATSAPP")
             data = json.loads(result.content)
 
             """message"""
@@ -122,34 +104,36 @@ def process_threads(**kwargs):
 
             """check for action = None"""
             if(data['action'] is not None):
-                if data['action'] == 'create':
+                if data['action'] == 'PUSH':
                     """update all menu session"""
                     m_session.active = 1
                     m_session.save()
 
                     """process data"""
-                    response = thread.process_data(uuid=OD_uuid)
+                    response = client.process_data(uuid=OD_uuid)
                     my_data = json.loads(response.content)
                     print(my_data)
-                    result = push_data(payload=my_data)
 
-        elif menu_response == 'INVALID_INPUT':
+                    """results"""
+                    result = push_data(payload=my_data, action_url=data['action_url'])
+
+        elif thread_response == 'INVALID_INPUT':
             """invalid input"""
-            message = "Chagua batili, tafadhali chagua tena!"
+            message = "Chaguo batili, tafadhali chagua tena!"
 
-        elif menu_response == 'END_MENU':
-            """update and end menu session"""
+        elif thread_response == 'END_MENU':
+            """update and end thread session"""
             m_session.active = 1
             m_session.save()
 
-            """initiate menu session"""
-            message = "Asante kwa kukamilisha usajili wako!"    
+            """initiate thread session"""
+            message = "Asante kwa kuripoti taarifa!"    
     else:
         if key.upper() == "START" or key.upper() == "ANZA":
-            """initiate menu session"""
-            message = thread.call_init_menu(phone=from_number, channel="whatsapp") 
+            """initiate thread session"""
+            message = client.init_thread(phone=from_number, channel="WHATSAPP") 
         else:
-            message = "Anzisha OHD chat ukitumia neno kuu START au ANZA"    
+            message = "Anzisha OHD Chatbot ukitumia neno kuu START au ANZA"    
 
     """return message"""
     return message
@@ -157,13 +141,11 @@ def process_threads(**kwargs):
 
 def push_data(**kwargs):
     """push data to external API"""
-    payload = kwargs['payload']
-
-    """base url"""
-    baseURL = "https://afyadata.sacids.org/api/v3/chatbot"
+    payload   = kwargs['payload']
+    actionURL = kwargs['action_url']
 
     """push data"""
-    response = requests.post(f"{baseURL}", data = json.dumps(payload), headers={"Content-Type": "application/json; charset=utf-8"})
+    response = requests.post(f"{actionURL}", data = json.dumps(payload), headers={"Content-Type": "application/json; charset=utf-8"})
     print(response.json())
         
     """response"""

@@ -21,7 +21,7 @@ from apps.api import views as api_views
 
 urlpatterns = [
     path('', admin.site.urls),
-    path('webhooks/twillio/', whatsapp_views.twillio),
+    # path('webhooks/twillio/', whatsapp_views.twillio),
     path('webhooks/facebook/', whatsapp_views.facebook),
     path('webhooks/telegram/', telegram_views.index),
     path('privacy_policy', whatsapp_views.privacy_policy),

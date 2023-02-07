@@ -4,12 +4,18 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Thread(models.Model):
     """Thread Model"""
+    ACTION_URL_OPTIONS = (
+        ('PUSH', 'PUSH'),
+        ('CREATE', 'CREATE'),
+    )
+
     title       =  models.TextField(blank=False, null=False)
     flag        =  models.CharField(max_length=50, blank=False, null=False)
     label       =  models.CharField(max_length=50, blank=True, null=True)
     pull        =  models.IntegerField(default=0, null=False)
-    url         =  models.CharField(max_length=50, blank=True, null=True)
-    action      =  models.CharField(max_length=20, blank=True, null=True)
+    url         =  models.CharField(max_length=200, blank=True, null=True)
+    action      =  models.CharField(max_length=20, choices=ACTION_URL_OPTIONS, blank=True, null=True)
+    action_url  =  models.CharField(max_length=200, blank=True, null=True)
     created_by  =  models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     updated_by  =  models.ForeignKey(User, related_name="updated_by", blank=True, null=True, on_delete=models.SET_NULL)
 
