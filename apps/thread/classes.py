@@ -162,8 +162,8 @@ class ThreadWrapper:
         """query thread"""
         thread  = Thread.objects.get(pk=thread_id)
 
-        """create  session"""
-        session = ThreadSession
+        """create  new session"""
+        session = ThreadSession()
         session.phone = phone  
         session.uuid = uuid
         session.thread_id = thread_id
