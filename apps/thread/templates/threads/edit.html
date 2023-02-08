@@ -12,12 +12,11 @@
     <div class="w-full h-full overflow-y-scroll">
         <div class="bg-gray-100">
             <div class="mx-12 py-2 px-4 sm:px-6 lg:px-8">
-                <h1 class="text-xl font-medium tracking-tight text-gray-900">Edit Thread</h1>
+                <h1 class="text-xl font-medium tracking-tight text-gray-600">Edit Thread</h1>
             </div>
         </div>
 
-        <div class="mx-auto py-4 px-4 sm:px-6 lg:px-8">
-
+        <div class="mx-12 py-4 px-4 sm:px-6 lg:px-8">
             {% if messages %}
             {% for message in messages %}
             <div class="mt-2 alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
@@ -26,23 +25,23 @@
             {% endfor %}
             {% endif %}
 
-            <form method="post" enctype="multipart/form-data" class="mx-48">
+            <form method="post" enctype="multipart/form-data" class="w-1/2 text-sm font-medium" autocomplete="off">
                 {% csrf_token %}
 
                 <div class="flex flex-wrap -mx-3 mb-3">
-                    <div class="w-full md:w-full px-3 text-sm font-medium">
+                    <div class="w-full md:w-full px-3">
                         {{ form.step|as_crispy_field }}
                     </div>
                 </div>
 
                 <div class="flex flex-wrap -mx-3 mb-3">
-                    <div class="w-full md:w-full px-3 text-sm font-medium">
+                    <div class="w-full md:w-full px-3">
                         {{ form.title|as_crispy_field }}
                     </div>
                 </div>
 
                 <div class="flex flex-wrap -mx-3 mb-3">
-                    <div class="w-full md:w-1/2 px-3 text-sm font-medium">
+                    <div class="w-full md:w-1/2 px-3">
                         {{ form.flag|as_crispy_field }}
                     </div>
 
@@ -52,21 +51,21 @@
                 </div>
 
                 <div class="flex flex-wrap -mx-3 mb-3">
-                    <div class="w-full md:w-1/4 px-3 text-sm font-medium">
+                    <div class="w-full md:w-1/4 px-3">
                         {{ form.pull|as_crispy_field }}
                     </div>
 
-                    <div class="w-full md:w-3/4 px-3 text-sm font-medium">
+                    <div class="w-full md:w-3/4 px-3">
                         {{ form.url|as_crispy_field }}
                     </div>
                 </div>
 
-                <div class="flex flex-wrap -mx-3 mb-3">
-                    <div class="w-full md:w-1/4 px-3 text-sm font-medium">
+                <div class="flex flex-wrap -mx-3 mb-0">
+                    <div class="w-full md:w-1/4 px-3">
                         {{ form.action|as_crispy_field }}
                     </div>
 
-                    <div class="w-full md:w-3/4 px-3 text-sm font-medium">
+                    <div class="w-full md:w-3/4 px-3">
                         {{ form.action_url|as_crispy_field }}
                     </div>
                 </div>
