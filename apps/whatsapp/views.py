@@ -50,7 +50,6 @@ def facebook(request):
 
     if request.method == 'POST':
         data = json.loads(request.body)
-        print(data)
 
         """extract => field, from, key, message_type"""
         field = data["entry"][0]["changes"][0]["field"]
@@ -85,7 +84,7 @@ def facebook(request):
                 print("No new message")
 
         """return response"""
-        return HttpResponse('success', status=200)    
+        return request.body()  
 
 
 def process_threads(**kwargs):
