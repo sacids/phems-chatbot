@@ -43,7 +43,7 @@ class ThreadWrapper:
 
             if (sub_thread_key):
                 thread_link = ThreadLink.objects.filter(
-                    thread_id=thread_id, sub_menu_id=sub_thread_key.id)
+                    thread_id=thread_id, sub_thread_id=sub_thread_key.id)
 
                 if(thread_link):
                     return 'NEXT_MENU'
@@ -77,7 +77,7 @@ class ThreadWrapper:
         message = ""
         if (sub_thread_key):
             thread_link = ThreadLink.objects.filter(
-                thread_id=thread_id, sub_menu_id=sub_thread_key[0].id)
+                thread_id=thread_id, sub_thread_id=sub_thread_key[0].id)
 
             if(thread_link):
                 """create session"""

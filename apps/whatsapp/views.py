@@ -12,7 +12,26 @@ from decouple import config
 
 VERIFY_TOKEN = config('WHATSAPP_VERIFY_TOKEN')
 
-#facebook webhooks
+
+def testing(request):
+    """message"""
+    message = request.GET.get('message')
+    from_number = request.GET.get('from_number')
+
+    print("key => " + message)
+    print("from number => " + from_number)
+
+    """process thread"""
+    new_message = process_threads(from_number=from_number, key=message)
+
+    """return response to telerivet"""
+    return HttpResponse(json.dumps({
+        'messages': [
+            {"content": new_message}
+        ]
+    }), 'application/json') 
+
+
 @csrf_exempt
 def facebook(request):
     """__summary__: Get message from the webhook"""
