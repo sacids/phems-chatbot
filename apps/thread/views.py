@@ -14,7 +14,7 @@ class ThreadListView(generic.ListView):
     model = Thread
     context_object_name = 'threads'
     template_name = 'threads/lists.html'
-    paginate_by = 50
+    # paginate_by = 50
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
@@ -130,7 +130,7 @@ class ThreadLinkListView(generic.ListView):
     model = ThreadLink
     context_object_name = 'thread_links'
     template_name = 'thread_links/lists.html'
-    paginate_by = 50
+    # paginate_by = 50
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
