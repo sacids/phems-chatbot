@@ -141,7 +141,7 @@ class ThreadLinkListView(generic.ListView):
         context['title'] = "Thread Links"
         context['threads'] = Thread.objects.order_by('step')
 
-        thread_links = ThreadLink.objects.all().order_by("thread__step")
+        thread_links = ThreadLink.objects.order_by("thread__step").all()
         context['thread_links'] = thread_links
 
         return context
