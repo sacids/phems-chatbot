@@ -16,55 +16,57 @@ VERIFY_TOKEN = config('WHATSAPP_VERIFY_TOKEN')
 @csrf_exempt
 def facebook(request):
     """__summary__: Get message from the webhook"""
-    if request.method == "GET":
-        if request.GET.get('hub.verify_token') == VERIFY_TOKEN:
-            return request.GET.get('hub.challenge')
-        return "Authentication failed. Invalid Token."
-
-    return HttpResponse({"status": "success"}, 200)
-
-@csrf_exempt
-def webhook(request):
-    """__summary__: Get message from the webhook"""
     client = WhatsAppWrapper()
 
-    data = request.get_json()
-    logging.info("Received webhook data: %s", data)
+    if request.method == "GET":
+        mode = request.GET['hub.mode']
+        token = request.GET['hub.verify_token']
+        challenge = request.GET['hub.challenge']
 
-    """extract => field, from, key, message_type"""
-    field = data["entry"][0]["changes"][0]["field"]
-
-    """check if field not messages and reply 400 response"""
-    if field != 'messages':
-        return HttpResponse(400)
-
-    """new message"""
-    new_message = client.get_mobile(data)
-
-    if new_message:
-        from_number = client.get_mobile(data)
-        profile_name = client.get_profile_name(data)
-        message_type = client.get_message_type(data)
-        timestamp = client.get_message_timestamp(data)
-        facebook_id = client.get_messageId(data)
-
-        if message_type == 'text':
-            message = client.get_message(data)
-
-            """process thread"""
-            new_message = process_threads(from_number=from_number, key=message)
-
-            """send message"""
-            response = client.send_text_message(from_number, new_message)
-    else:
-        delivery = client.get_delivery(data)
-        if delivery:
-            print(f"Message : {delivery}")
+        if mode == 'subscribe' and token == VERIFY_TOKEN:
+            return HttpResponse(challenge, status = 200)
         else:
-            print("No new message")
+            return HttpResponse('Authentication failed. Invalid Token.', status=403)    
 
-    """return response to facebook"""
-    return request.get_json()
+
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        print(data)
+
+        """extract => field, from, key, message_type"""
+        field = data["entry"][0]["changes"][0]["field"]
+
+        """check if field not messages and reply 400 response"""
+        if field != 'messages':
+            return HttpResponse('Invalid data', 400)
+
+        """new message"""
+        new_message = client.get_mobile(data)
+
+        if new_message:
+            from_number = client.get_mobile(data)
+            profile_name = client.get_profile_name(data)
+            message_type = client.get_message_type(data)
+            timestamp = client.get_message_timestamp(data)
+            facebook_id = client.get_messageId(data)
+
+            if message_type == 'text':
+                message = client.get_message(data)
+
+                """process thread"""
+                new_message = process_threads(from_number=from_number, key=message)
+
+                """send message"""
+                response = client.send_text_message(from_number, new_message)
+        else:
+            delivery = client.get_delivery(data)
+            if delivery:
+                print(f"Message : {delivery}")
+            else:
+                print("No new message")
+
+        """return response"""
+        return HttpResponse('success', status=200)    
 
 
 def process_threads(**kwargs):
