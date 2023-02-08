@@ -16,7 +16,7 @@ VERIFY_TOKEN = config('WHATSAPP_VERIFY_TOKEN')
 @csrf_exempt
 def facebook(request):
     """__summary__: Get message from the webhook"""
-    client = WhatsAppWrapper()
+    wrapper = WhatsAppWrapper()
 
     if request.method == "GET":
         mode = request.GET['hub.mode']
@@ -41,25 +41,25 @@ def facebook(request):
             return HttpResponse('Invalid data', 400)
 
         """new message"""
-        new_message = client.get_mobile(data)
+        new_message = wrapper.get_mobile(data)
 
         if new_message:
-            from_number = client.get_mobile(data)
-            profile_name = client.get_profile_name(data)
-            message_type = client.get_message_type(data)
-            timestamp = client.get_message_timestamp(data)
-            facebook_id = client.get_messageId(data)
+            from_number = wrapper.get_mobile(data)
+            profile_name = wrapper.get_profile_name(data)
+            message_type = wrapper.get_message_type(data)
+            timestamp = wrapper.get_message_timestamp(data)
+            facebook_id = wrapper.get_messageId(data)
 
             if message_type == 'text':
-                message = client.get_message(data)
+                message = wrapper.get_message(data)
 
                 """process thread"""
                 new_message = process_threads(from_number=from_number, key=message)
 
                 """send message"""
-                response = client.send_text_message(from_number, new_message)
+                response = wrapper.send_text_message(from_number, new_message)
         else:
-            delivery = client.get_delivery(data)
+            delivery = wrapper.get_delivery(data)
             if delivery:
                 print(f"Message : {delivery}")
             else:

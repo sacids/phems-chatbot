@@ -27,9 +27,9 @@ class ThreadWrapper:
         uuid = ''.join(random.choices(string.ascii_uppercase, k=12))
 
         """Create menu session"""
-        session_id = self.create_menu_session(phone=phone, thread_id=thread.id, uuid=uuid, channel=channel)
+        session_id = self.create_thread_session(phone=phone, thread_id=thread.id, uuid=uuid, channel=channel)
 
-        message = self.process_menu(thread.id, uuid)
+        message = self.process_thread(thread.id, uuid)
 
         return message
 
