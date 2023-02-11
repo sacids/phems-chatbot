@@ -43,6 +43,78 @@ class WhatsAppWrapper:
         if 'messages' in data:
             return data['messages'][0]['text']['body']
 
+    def get_location(self, data):
+        """get location from the data"""
+        data = self.preprocess(data)
+
+        if "messages" in data:
+            if "location" in data["messages"][0]:
+                return data["messages"][0]["location"]
+
+    def get_image(self, data):
+        """get image from the data"""
+        data = self.preprocess(data)
+
+        if "messages" in data:
+            if "image" in data["messages"][0]:
+                return data["messages"][0]["image"]
+
+
+    def get_document(self, data):
+        """get document from the data"""
+        data = self.preprocess(data)
+
+        if "messages" in data:
+            if "document" in data["messages"][0]:
+                return data["messages"][0]["document"]
+
+
+    def get_audio(self, data):
+        """get audio from the data"""
+        data = self.preprocess(data)
+
+        if "messages" in data:
+            if "audio" in data["messages"][0]:
+                return data["messages"][0]["audio"]
+
+
+    def get_video(self, data):
+        """get video from the data"""
+        data = self.preprocess(data)
+
+        if "messages" in data:
+            if "video" in data["messages"][0]:
+                return data["messages"][0]["video"]
+
+
+    def query_media_url(self, media_id):
+        """Query media url from media id obtained either by manually uploading media or received media"""
+        r = requests.get(f"{self.API_URL}/{media_id}", headers=self.headers)
+        
+        if r.status_code == 200:
+            return r.json()["url"]
+        return None
+
+
+    def download_media(self, media_url, mime_type, file_path= "temp"):
+        """Download media from media url obtained either by manually uploading media or received media"""
+        r = requests.get(media_url, headers=self.headers)
+        content = r.content
+        extension = mime_type.split("/")[1]
+
+        # create a temporary file
+        try:
+            save_file_here = (
+                f"{file_path}.{extension}" if file_path else f"temp.{extension}"
+            )
+            with open(save_file_here, "wb") as f:
+                f.write(content)
+            return f.name
+        except Exception as e:
+            print(e)
+            return None
+
+
     def get_messageId(self, data):
         """get message id from data"""
         data = self.preprocess(data) 

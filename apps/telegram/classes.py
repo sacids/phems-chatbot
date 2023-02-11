@@ -1,8 +1,5 @@
-import json
 import requests
-from django.http import HttpResponse, JsonResponse
 from decouple import config
-
 
 class TelegramWrapper:
     API_URL="https://api.telegram.org/bot"
@@ -24,8 +21,30 @@ class TelegramWrapper:
             return 'location'  
 
     def get_message(self, data):
+        """get message text from the data"""
         if 'text' in data:
-            return data['text']    
+            return data['text']  
+
+    def get_location(self, data):
+        """get location from the data"""
+
+        if "location" in data:
+            return data["location"]
+
+    def get_image(self, data):
+        """get image from the data"""
+        
+        if "photo" in data:
+            return data["photo"]
+
+    def query_media_url(self, media_id):
+        """Query media url from media id obtained either by manually uploading media or received media"""
+        response = requests.get(f"{self.API_URL}{self.API_TOKEN}/getFile?file_id={media_id}", headers=self.headers)
+        response = response.json()
+        
+        if response['ok'] == "true":
+            return response['result']['file_path']
+        return None
 
     def send_text_message(self, chat_id, message):
         """__summary__: Send text message """

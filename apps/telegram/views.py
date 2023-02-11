@@ -1,22 +1,17 @@
 import json
-import logging
 import requests
-from decouple import config
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .classes import TelegramWrapper
 from apps.thread.classes import ThreadWrapper
 from apps.thread.models import *
-from decouple import config
 
-TELEGRAM_URL="https://api.telegram.org/bot"
-BOT_TOKEN=config('TELEGRAM_BOT_TOKEN')
 
 # Create your views here.
 @csrf_exempt
 def index(request):
     """__summary__: Get message from the webhook"""
-    client = TelegramWrapper()
+    wrapper = TelegramWrapper()
 
     """data from Telegram"""
     t_data = json.loads(request.body)
@@ -26,17 +21,36 @@ def index(request):
     print(f'telegram bot says {t_message}')
     
     """message type"""
-    message_type = client.get_message_type(t_message)
+    message_type = wrapper.get_message_type(t_message)
 
     if message_type == 'text':
-        message = client.get_message(t_message)
+        message = wrapper.get_message(t_message)
         from_number = t_chat["id"]
 
         """process thread"""
         new_message = process_threads(from_number=from_number, key=message)
 
         """send message"""
-        response = client.send_text_message(from_number, new_message)
+        response = wrapper.send_text_message(from_number, new_message)
+
+    elif message_type == 'photo':
+        photo = wrapper.get_image(t_message)  
+        from_number = t_chat["id"]
+
+        """get image data"""
+        image_id = photo[0]["file_id"]
+        image_url = wrapper.query_media_url(image_id)
+
+        print("image URL")
+        print(image_url)
+
+        """TODO: save image to a folder"""
+
+        """process thread"""
+        new_message = process_threads(from_number=from_number, key=image_url)
+
+        """send message"""
+        response = wrapper.send_text_message(from_number, new_message)
 
     """return response"""
     return JsonResponse({"ok": "POST request processed"})
@@ -79,17 +93,16 @@ def process_threads(**kwargs):
 
             """check for action = None"""
             if(data['action'] is not None):
+                """update all menu session"""
+                ThreadSession.objects.filter(uuid=OD_uuid).update(active=1)
+
+                """process data"""
+                response = client.process_data(uuid=OD_uuid)
+                my_data = json.loads(response.content)
+                print(my_data)
+
                 if data['action'] == 'PUSH':
-                    """update all menu session"""
-                    m_session.active = 1
-                    m_session.save()
-
-                    """process data"""
-                    response = client.process_data(uuid=OD_uuid)
-                    my_data = json.loads(response.content)
-                    print(my_data)
-
-                    """results"""
+                    """push data"""
                     result = push_data(payload=my_data, action_url=data['action_url'])
 
         elif thread_response == 'INVALID_INPUT':

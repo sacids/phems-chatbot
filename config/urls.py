@@ -25,7 +25,6 @@ urlpatterns = [
     path('admin', admin.site.urls),
     path('threads/', include('apps.thread.urls')),
 
-    # path('webhooks/twillio/', whatsapp_views.twillio),
     path('webhook/testing', whatsapp_views.testing),
     path('webhook/facebook', whatsapp_views.facebook),
     path('webhook/telegram', telegram_views.index),

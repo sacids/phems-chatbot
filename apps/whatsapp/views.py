@@ -11,6 +11,7 @@ from apps.thread.models import *
 from decouple import config
 
 VERIFY_TOKEN = config('WHATSAPP_VERIFY_TOKEN')
+API_URL = "https://graph.facebook.com/v15.0/"
 
 
 def testing(request):
@@ -77,6 +78,37 @@ def facebook(request):
 
                 """send message"""
                 response = wrapper.send_text_message(from_number, new_message)
+
+            elif message_type == 'location':
+                message_location = wrapper.get_location(data)
+
+                """latitude and longitude"""
+                latitude     = message_location["latitude"]
+                longitude    = message_location["longitude"]
+                new_location = f"{latitude} {longitude}"
+
+                """process thread"""
+                new_message = process_threads(from_number=from_number, key=new_location)
+
+                """send message"""
+                response = wrapper.send_text_message(from_number, new_message)
+
+            elif message_type == 'image':
+                image = wrapper.get_image(data)  
+
+                """get image data"""
+                image_id, mime_type = image["id"], image["mime_type"]
+                image_url = wrapper.query_media_url(image_id)
+                image_filename = wrapper.download_media(image_url, mime_type) 
+
+                """TODO: save image to a folder"""
+
+                """process thread"""
+                new_message = process_threads(from_number=from_number, key=image_filename)
+
+                """send message"""
+                response = wrapper.send_text_message(from_number, new_message)
+
         else:
             delivery = wrapper.get_delivery(data)
             if delivery:
@@ -125,17 +157,16 @@ def process_threads(**kwargs):
 
             """check for action = None"""
             if(data['action'] is not None):
+                """update all menu session"""
+                ThreadSession.objects.filter(uuid=OD_uuid).update(active=1)
+
+                """process data"""
+                response = client.process_data(uuid=OD_uuid)
+                my_data = json.loads(response.content)
+                print(my_data)
+
                 if data['action'] == 'PUSH':
-                    """update all menu session"""
-                    m_session.active = 1
-                    m_session.save()
-
-                    """process data"""
-                    response = client.process_data(uuid=OD_uuid)
-                    my_data = json.loads(response.content)
-                    print(my_data)
-
-                    """results"""
+                    """push data"""
                     result = push_data(payload=my_data, action_url=data['action_url'])
 
         elif thread_response == 'INVALID_INPUT':
