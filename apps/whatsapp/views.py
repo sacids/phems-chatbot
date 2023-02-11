@@ -99,16 +99,17 @@ def facebook(request):
                 """get image data"""
                 image_id, mime_type = image["id"], image["mime_type"]
                 image_url = wrapper.query_media_url(image_id)
-                image_filename = wrapper.download_media(image_url, mime_type) 
+  
+                print("image URL")
+                print(image_url)
 
                 """TODO: save image to a folder"""
 
                 """process thread"""
-                new_message = process_threads(from_number=from_number, key=image_filename)
+                new_message = process_threads(from_number=from_number, key=image_url)
 
                 """send message"""
                 response = wrapper.send_text_message(from_number, new_message)
-
         else:
             delivery = wrapper.get_delivery(data)
             if delivery:

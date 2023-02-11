@@ -89,10 +89,13 @@ class WhatsAppWrapper:
 
     def query_media_url(self, media_id):
         """Query media url from media id obtained either by manually uploading media or received media"""
-        r = requests.get(f"{self.API_URL}/{media_id}", headers=self.headers)
-        
-        if r.status_code == 200:
-            return r.json()["url"]
+        response = requests.get(f"{self.API_URL}/{media_id}", headers=self.headers)
+
+        if response.status_code == 200:
+            fileURL = response.json()["url"]
+
+            """return URL"""
+            return fileURL
         return None
 
 

@@ -43,7 +43,8 @@ class TelegramWrapper:
         response = response.json()
         
         if response['ok'] == "true":
-            return response['result']['file_path']
+            fileURL = response['result']['file_path']
+            return fileURL
         return None
 
     def send_text_message(self, chat_id, message):
