@@ -158,11 +158,6 @@ def process_threads(**kwargs):
 
             """check for action = None"""
             if(data['action'] is not None):
-                """update all menu session"""
-                m_session.active = 1
-                m_session.save()
-                #ThreadSession.objects.filter(uuid=OD_uuid).update(active=1)
-
                 """process data"""
                 response = client.process_data(uuid=OD_uuid)
                 my_data = json.loads(response.content)
@@ -178,11 +173,19 @@ def process_threads(**kwargs):
 
         elif thread_response == 'END_MENU':
             """update and end thread session"""
-            m_session.active = 1
-            m_session.save()
+            ThreadSession.objects.filter(uuid=OD_uuid).update(active=1)
+
+            """process data"""
+            response = client.process_data(uuid=OD_uuid)
+            my_data = json.loads(response.content)
+            print(my_data)
+
+            if data['action'] == 'PUSH':
+                """push data"""
+                result = push_data(payload=my_data, action_url=data['action_url'])
 
             """initiate thread session"""
-            message = "Asante kwa kuripoti taarifa!"    
+            message = "Asante kwa kuripoti taarifa!, tunazichambua taarifa zako na kuzifanyia kazi."    
     else:
         if key.upper() == "TAARIFA" or key.upper() == "ANZA":
             """initiate thread session"""
