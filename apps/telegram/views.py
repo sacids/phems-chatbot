@@ -94,7 +94,9 @@ def process_threads(**kwargs):
             """check for action = None"""
             if(data['action'] is not None):
                 """update all menu session"""
-                ThreadSession.objects.filter(uuid=OD_uuid).update(active=1)
+                m_session.active = 1
+                m_session.save()
+                #ThreadSession.objects.filter(uuid=OD_uuid).update(active=1)
 
                 """process data"""
                 response = client.process_data(uuid=OD_uuid)
@@ -121,7 +123,7 @@ def process_threads(**kwargs):
             """initiate thread session"""
             message = client.init_thread(phone=from_number, channel="TELEGRAM") 
         else:
-            message = "Anzisha OHD Chatbot ukitumia neno kuu START au ANZA"    
+            message = "Ripoti taarifa za matukio kwa OHD Chatbot kwa kutuma neno TAARIFA au ANZA"    
 
     """return message"""
     return message
