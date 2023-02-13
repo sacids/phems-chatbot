@@ -119,7 +119,7 @@ def process_threads(**kwargs):
             """initiate thread session"""
             message = "Asante kwa kuripoti taarifa!"    
     else:
-        if key.upper() == "START" or key.upper() == "ANZA":
+        if key.upper() == "TAARIFA" or key.upper() == "ANZA":
             """initiate thread session"""
             message = client.init_thread(phone=from_number, channel="TELEGRAM") 
         else:
