@@ -70,6 +70,7 @@ class ThreadWrapper:
 
         """action"""
         action = None
+        action_url = None
 
         """sub thread"""
         sub_thread_key = SubThread.objects.filter(thread_id=thread_id, view_id=key)
@@ -91,6 +92,7 @@ class ThreadWrapper:
 
                 if thread.action is not None:
                     action = thread.action           
+                    action_url = thread.action_url           
             else:
                 """message"""
                 message = "Invalid input"
@@ -109,12 +111,13 @@ class ThreadWrapper:
 
                 if thread.action is not None:
                     action = thread.action
+                    action_url = thread.action_url  
             else:
                 """message"""
                 message = "Invalid input"
 
         """return response"""
-        return JsonResponse({'status': 'success', 'message': message, 'action': action})
+        return JsonResponse({'status': 'success', 'message': message, 'action': action, 'action_url': action_url})
 
 
     def process_thread(self, thread_id, uuid):

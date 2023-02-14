@@ -65,68 +65,83 @@ def process_threads(**kwargs):
     message = ""
 
     """thread wrapper"""
-    client = ThreadWrapper()
+    wrapper = ThreadWrapper()
 
     """Follow thread session and Trigger follow up menu"""
     thread_session = ThreadSession.objects.filter(phone=from_number, active=0) 
 
     if thread_session.count() > 0:
-        m_session = ThreadSession.objects.filter(phone=from_number, active=0).latest('id')
-        thread_response = client.check_thread_link(m_session.thread_id, key) 
+        if key.upper() == "TAARIFA" or key.upper() == "TUKIO":
+            """update all menu sessions"""
+            ThreadSession.objects.filter(phone=from_number).update(active=1)
 
-        if thread_response == 'NEXT_MENU':
-            """update thread session"""
-            m_session.active = 1
-            m_session.values = key
-            m_session.save()
+            """init thread"""
+            message = wrapper.init_thread(phone=from_number, channel="WHATSAPP") 
+        else:
+            m_session = ThreadSession.objects.filter(phone=from_number, active=0).latest('id')
+            thread_response = wrapper.check_thread_link(m_session.thread_id, key) 
 
-            """update data """
+            """ menu session data """
             OD_uuid = m_session.uuid
             OD_thread_id = m_session.thread_id
 
-            """result"""
-            result = client.next_thread(phone=from_number, uuid=OD_uuid, thread_id=OD_thread_id, key=key, channel="TELEGRAM")
-            data = json.loads(result.content)
+            if thread_response == 'NEXT_MENU':
+                """update thread session"""
+                m_session.active = 1
+                m_session.values = key
+                m_session.save()
 
-            """message"""
-            message = data['message']
+                """result"""
+                result = wrapper.next_thread(phone=from_number, uuid=OD_uuid, thread_id=OD_thread_id, key=key, channel="WHATSAPP")
+                data = json.loads(result.content)
+                print(data)
 
-            """check for action = None"""
-            if(data['action'] is not None):
-                """process data"""
-                response = client.process_data(uuid=OD_uuid)
-                my_data = json.loads(response.content)
-                print(my_data)
+                """message"""
+                message = data['message']
 
-                if data['action'] == 'PUSH':
-                    """push data"""
-                    result = push_data(payload=my_data, action_url=data['action_url'])
+                """check for action = None"""
+                if(data['action'] is not None):
+                    """process data"""
+                    my_data = wrapper.process_data(uuid=OD_uuid)
+                    print("response")
+                    print(my_data)
 
-        elif thread_response == 'INVALID_INPUT':
-            """invalid input"""
-            message = "Chaguo batili, tafadhali chagua tena!"
+                    if data['action'] == 'PUSH':
+                        """update and end thread session"""
+                        ThreadSession.objects.filter(uuid=OD_uuid).update(active=1)
 
-        elif thread_response == 'END_MENU':
-            """update all menu session"""
-            ThreadSession.objects.filter(uuid=OD_uuid).update(active=1)
+                        """push data"""
+                        result = push_data(payload=my_data, action_url=data['action_url'])
 
-            """process data"""
-            response = client.process_data(uuid=OD_uuid)
-            my_data = json.loads(response.content)
-            print(my_data)
+            elif thread_response == 'INVALID_INPUT':
+                """invalid input"""
+                message = "Chaguo batili, tafadhali chagua tena!"
+            elif thread_response == 'END_MENU':
+                """update and end thread session"""
+                ThreadSession.objects.filter(uuid=OD_uuid).update(active=1)
 
-            if data['action'] == 'PUSH':
-                """push data"""
-                result = push_data(payload=my_data, action_url=data['action_url'])
+                """query menu data"""
+                thread = Thread.objects.filter(pk=OD_thread_id)
 
-            """initiate thread session"""
-            message = "Asante kwa kuripoti taarifa!, tunazichambua taarifa na kuzifanyia kazi."    
+                if thread.count() > 0:
+                    thread = thread.first()
+
+                    """process data"""
+                    my_data = wrapper.process_data(uuid=OD_uuid)
+                    print(my_data)
+
+                    if thread.action == 'PUSH':
+                        """push data"""
+                        result = push_data(payload=my_data, action_url=thread.action_url)
+
+                """initiate thread session"""
+                message = "Asante kwa kuripoti taarifa!, tunazichambua taarifa zako na kuzifanyia kazi." 
     else:
-        if key.upper() == "TAARIFA" or key.upper() == "ANZA":
+        if key.upper() == "TAARIFA" or key.upper() == "TUKIO":
             """initiate thread session"""
-            message = client.init_thread(phone=from_number, channel="TELEGRAM") 
+            message = wrapper.init_thread(phone=from_number, channel="WHATSAPP") 
         else:
-            message = "Ripoti taarifa za matukio kwa OHD Chatbot kwa kutuma neno TAARIFA au ANZA"    
+            message = "Ripoti taarifa za matukio kwa OHD Chatbot kwa kutuma neno TAARIFA au TUKIO"   
 
     """return message"""
     return message
