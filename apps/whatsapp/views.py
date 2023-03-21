@@ -136,7 +136,7 @@ def process_threads(**kwargs):
     thread_session = ThreadSession.objects.filter(phone=from_number, active=0) 
 
     if thread_session.count() > 0:
-        if key.upper() == "TAARIFA" or key.upper() == "TUKIO":
+        if key.upper() == "TAARIFA" or key.upper() == "TUKIO" or key.upper() == "MAAFA":
             """update all menu sessions"""
             ThreadSession.objects.filter(phone=from_number).update(active=1)
 
