@@ -76,7 +76,7 @@ def process_threads(**kwargs):
             ThreadSession.objects.filter(phone=from_number).update(active=1)
 
             """init thread"""
-            message = wrapper.init_thread(phone=from_number, channel="WHATSAPP") 
+            message = wrapper.init_thread(phone=from_number, channel="TELEGRAM") 
         else:
             m_session = ThreadSession.objects.filter(phone=from_number, active=0).latest('id')
             thread_response = wrapper.check_thread_link(m_session.thread_id, key) 
@@ -92,7 +92,7 @@ def process_threads(**kwargs):
                 m_session.save()
 
                 """result"""
-                result = wrapper.next_thread(phone=from_number, uuid=OD_uuid, thread_id=OD_thread_id, key=key, channel="WHATSAPP")
+                result = wrapper.next_thread(phone=from_number, uuid=OD_uuid, thread_id=OD_thread_id, key=key, channel="TELEGRAM")
                 data = json.loads(result.content)
                 print(data)
 
@@ -139,7 +139,7 @@ def process_threads(**kwargs):
     else:
         if key.upper() == "TAARIFA" or key.upper() == "TUKIO" or key.upper() == "MAAFA":
             """initiate thread session"""
-            message = wrapper.init_thread(phone=from_number, channel="WHATSAPP") 
+            message = wrapper.init_thread(phone=from_number, channel="TELEGRAM") 
         else:
             message = "Ripoti taarifa za matukio kwa MAAFA Chatbot kwa kutuma neno TAARIFA au TUKIO au MAAFA"   
 
