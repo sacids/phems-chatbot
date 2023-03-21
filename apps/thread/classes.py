@@ -9,7 +9,7 @@ from .models import *
 class ThreadWrapper:
     """class control all the thread in the chatbot"""
     #BASE_URL   = "http://127.0.0.1:8000/"
-    BASE_URL   = "http://net.sacids.org/"
+    BASE_URL   = "https://net.sacids.org/"
 
     def __init__(self):
         pass

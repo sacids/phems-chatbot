@@ -135,7 +135,7 @@ def process_threads(**kwargs):
                         result = push_data(payload=my_data, action_url=thread.action_url)
 
                 """initiate thread session"""
-                message = "Asante kwa kuripoti taarifa!, tunazichambua taarifa zako na kuzifanyia kazi." 
+                message = "Asante kwa kuripoti taarifa, tunazichambua taarifa zako na kuzifanyia kazi." 
     else:
         if key.upper() == "TAARIFA" or key.upper() == "TUKIO" or key.upper() == "MAAFA":
             """initiate thread session"""
