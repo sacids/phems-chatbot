@@ -137,11 +137,11 @@ def process_threads(**kwargs):
                 """initiate thread session"""
                 message = "Asante kwa kuripoti taarifa!, tunazichambua taarifa zako na kuzifanyia kazi." 
     else:
-        if key.upper() == "TAARIFA" or key.upper() == "TUKIO":
+        if key.upper() == "TAARIFA" or key.upper() == "TUKIO" or key.upper() == "MAAFA":
             """initiate thread session"""
             message = wrapper.init_thread(phone=from_number, channel="WHATSAPP") 
         else:
-            message = "Ripoti taarifa za matukio kwa OHD Chatbot kwa kutuma neno TAARIFA au TUKIO"   
+            message = "Ripoti taarifa za matukio kwa MAAFA Chatbot kwa kutuma neno TAARIFA au TUKIO au MAAFA"   
 
     """return message"""
     return message
