@@ -197,7 +197,6 @@ def process_threads(**kwargs):
 
                     """process data"""
                     my_data = wrapper.process_data(uuid=OD_uuid)
-                    print(my_data)
 
                     if thread.action == 'PUSH':
                         """push data"""

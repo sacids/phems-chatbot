@@ -86,32 +86,34 @@ def process_threads(**kwargs):
             OD_thread_id = m_session.thread_id
 
             if thread_response == 'NEXT_MENU':
-                """update thread session"""
-                m_session.active = 1
-                m_session.values = key
-                m_session.save()
-
                 """result"""
-                result = wrapper.next_thread(phone=from_number, uuid=OD_uuid, thread_id=OD_thread_id, key=key, channel="TELEGRAM")
+                result = wrapper.validate_thread(phone=from_number, uuid=OD_uuid, thread_id=OD_thread_id, key=key, channel="TELEGRAM")
                 data = json.loads(result.content)
-                print(data)
 
-                """message"""
-                message = data['message']
+                """status"""
+                status = data['status']
 
-                """check for action = None"""
-                if(data['action'] is not None):
-                    """process data"""
-                    my_data = wrapper.process_data(uuid=OD_uuid)
-                    print("response")
-                    print(my_data)
+                if status == 'success':
+                    """update thread session"""
+                    m_session.active = 1
+                    m_session.values = data['value']
+                    m_session.save()
 
-                    if data['action'] == 'PUSH':
-                        """update and end thread session"""
-                        ThreadSession.objects.filter(uuid=OD_uuid).update(active=1)
+                    """check for action = None"""
+                    if(data['action'] is not None):
+                        """process data"""
+                        my_data = wrapper.process_data(uuid=OD_uuid)
 
-                        """push data"""
-                        result = push_data(payload=my_data, action_url=data['action_url'])
+                        if data['action'] == 'PUSH':
+                            """update and end thread session"""
+                            ThreadSession.objects.filter(uuid=OD_uuid).update(active=1)
+
+                            """push data"""
+                            result = push_data(payload=my_data, action_url=data['action_url'])
+
+                elif status == 'failed':
+                    """message"""
+                    message = data['message']
 
             elif thread_response == 'INVALID_INPUT':
                 """invalid input"""
@@ -128,7 +130,6 @@ def process_threads(**kwargs):
 
                     """process data"""
                     my_data = wrapper.process_data(uuid=OD_uuid)
-                    print(my_data)
 
                     if thread.action == 'PUSH':
                         """push data"""
