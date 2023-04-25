@@ -8,8 +8,8 @@ from .models import *
 
 class ThreadWrapper:
     """class control all the thread in the chatbot"""
-    #BASE_URL   = "http://127.0.0.1:8000/"
-    BASE_URL   = "https://net.sacids.org/"
+    BASE_URL   = "http://127.0.0.1:8000/"
+    #BASE_URL   = "https://net.sacids.org/"
 
     def __init__(self):
         pass
@@ -91,7 +91,7 @@ class ThreadWrapper:
 
                 if data == 'INVALID_INPUT':
                     """response"""
-                    message = "Ingizo batili, Tafadhali rudia."
+                    message = result.json()['message']
                     response = JsonResponse({'status': 'failed', 'message': message, 'action': None, 'action_url': None})
 
                 elif result.json()['data'] == 'WARD_MENU':

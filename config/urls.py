@@ -36,6 +36,7 @@ urlpatterns = [
 
     path('api/validation/village', validate_village),
     path('api/validation/ward', validate_ward),
+    path('api/validation/date', validate_date),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

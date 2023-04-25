@@ -1,3 +1,4 @@
+from datetime import datetime, date
 from django.http import JsonResponse
 from apps.setup.models import *
 from apps.thread.models import *
@@ -19,7 +20,7 @@ def validate_village(request):
             return JsonResponse({'error': True, 'validation': False, 'data': 'WARD_MENU', 'value': village[0].name})
     else:
         """Invalid input"""
-        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT'})
+        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Kijiji ukichoingiza hakipo, tafadhali rudia.'})
 
         
 def validate_ward(request):
@@ -47,7 +48,44 @@ def validate_ward(request):
             pass
     else:
         """Invalid input"""
-        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT'})
+        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Kata uliyoingiza haipo, tafadhali rudia.'})
+    
+
+def validate_date(request):
+    """validate date"""
+    rumor_date = request.GET.get('key')
+
+    # initializing format
+    format = "%d/%m/%Y"
+
+    # checking if format matches the date
+    res = True
+    
+    # using try-except to check for truth value
+    try:
+        res = bool(datetime.strptime(rumor_date, format))
+    except ValueError:
+        res = False
+
+    """check if validation pass on date format"""
+    if res == True:
+        """comparing menu"""
+        past = datetime.strptime(rumor_date, "%d/%m/%Y")
+        present = datetime.now() 
+ 
+        if past.date() <= present.date():
+            """validation True"""
+            return JsonResponse({'error': False, 'validation': True, 'data': 'NEXT_MENU', 'value': rumor_date})
+        else:
+            """Invalid input"""
+            return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Tarehe ya tukio isizidi tarehe ya leo, tafadhali rudia.'})
+    else:
+        """Invalid input"""
+        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Umekosea kuingiza tarehe, tafadhali rudia. mfano 26/04/2023'})
+
+
+
+
 
 
 
