@@ -3,13 +3,13 @@ import random
 import string
 import requests
 import json
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from .models import *
 
 class ThreadWrapper:
     """class control all the thread in the chatbot"""
-    #BASE_URL   = "http://127.0.0.1:8000/"
-    BASE_URL   = "https://net.sacids.org/"
+    BASE_URL   = "http://127.0.0.1:8000/"
+    #BASE_URL   = "https://net.sacids.org/"
 
     def __init__(self):
         pass
@@ -60,6 +60,81 @@ class ThreadWrapper:
                 return 'END_MENU'
 
 
+    def validate_thread(self, **kwargs):
+        """validation rules"""
+        phone       = kwargs['phone']
+        uuid        = kwargs['uuid']
+        thread_id   = kwargs['thread_id']
+        key         = kwargs['key']
+        channel     = kwargs['channel']
+
+        """thread"""
+        thread = Thread.objects.filter(id=thread_id).first()
+
+        response = {}
+
+        if thread.verify == 1:
+            """Construct URL"""
+            URL = self.BASE_URL + thread.verify_url
+        
+            """validate thread"""
+            result = requests.get(URL, params={"uuid": uuid, "thread_id": thread_id, "key": key})
+
+            if result.json()['validation'] == True:
+                """get key value"""
+                key_value = result.json()['value']
+
+                """call next menu"""
+                response = self.next_thread(phone=phone, uuid=uuid, thread_id=thread_id, key=key_value, channel=channel)
+            else:
+                data = result.json()['data']
+
+                if data == 'INVALID_INPUT':
+                    """response"""
+                    message = "Ingizo batili, Tafadhali rudia."
+                    response = JsonResponse({'status': 'failed', 'message': message, 'action': None, 'action_url': None})
+
+                elif result.json()['data'] == 'WARD_MENU':
+                    """get key value"""
+                    key_value = result.json()['value']
+
+                    """current thread"""
+                    cr_thread = Thread.objects.filter(flag='Thread_Kata').first()
+
+                    """call next menu"""
+                    response = self.current_thread(phone=phone, uuid=uuid, thread_id=cr_thread.id, key=key_value, channel=channel)
+                elif result.json()['data'] == 'DISTRICT_MENU':
+                    pass
+        else: 
+            response = self.next_thread(phone=phone, uuid=uuid, thread_id=thread_id, key=key, channel=channel)
+        return response    
+
+
+    def current_thread(self, **kwargs):
+        """Triggering current menu"""
+        phone       = kwargs['phone']
+        uuid        = kwargs['uuid']
+        thread_id   = kwargs['thread_id']
+        key         = kwargs['key']
+        channel     = kwargs['channel']
+
+        """action"""
+        action = None
+        action_url = None
+
+        """thread"""
+        thread = Thread.objects.get(pk=thread_id)
+
+        """create session"""
+        session_id = self.create_thread_session(phone=phone, thread_id=thread.pk, uuid=uuid, channel=channel)
+
+        """process thread"""
+        message = self.process_thread(thread.id, uuid)
+
+        """return response"""
+        return JsonResponse({'status': 'success', 'value': key, 'message': message, 'action': action, 'action_url': action_url})
+
+
     def next_thread(self, **kwargs):
         """Triggering Next Thread"""
         phone       = kwargs['phone']
@@ -71,7 +146,7 @@ class ThreadWrapper:
         """action"""
         action = None
         action_url = None
-
+   
         """sub thread"""
         sub_thread_key = SubThread.objects.filter(thread_id=thread_id, view_id=key)
 
@@ -117,7 +192,7 @@ class ThreadWrapper:
                 message = "Invalid input"
 
         """return response"""
-        return JsonResponse({'status': 'success', 'message': message, 'action': action, 'action_url': action_url})
+        return JsonResponse({'status': 'success', 'value': key, 'message': message, 'action': action, 'action_url': action_url})
 
 
     def process_thread(self, thread_id, uuid):
@@ -128,9 +203,9 @@ class ThreadWrapper:
         thread = Thread.objects.get(pk=thread_id)
         message = thread.title
 
-        if thread.pull == 1:
+        if thread.pull_url is not None:
             """Construct URL"""
-            URL = self.BASE_URL + thread.url
+            URL = self.BASE_URL + thread.pull_url
 
             """response"""
             response = requests.get(URL, params={"message_id": uuid})
@@ -140,8 +215,7 @@ class ThreadWrapper:
                 sub_message += data
 
             message = message + "\r\n" + sub_message  
-
-        elif thread.pull == 0:     
+        else:     
             sub_threads = SubThread.objects.filter(thread_id=thread_id).order_by('view_id')
 
             if(sub_threads):

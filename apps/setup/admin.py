@@ -37,14 +37,14 @@ class DistrictAdmin(admin.ModelAdmin):
 
 @admin.register(Ward)
 class WardAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'district']
+    list_display = ['id', 'name', 'dictionary', 'district']
     search_fields = ['name__startwith']
     ordering = ("id",)
     inlines  = [VillageInline]
 
 @admin.register(Village)
 class VillageAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'ward']
+    list_display = ['id', 'name', 'dictionary', 'ward']
     search_fields = ['name__startwith']
     ordering = ("id",)
     inlines  = [HamletInline]

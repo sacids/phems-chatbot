@@ -3,8 +3,9 @@ from django.db import models
 # Create your models here.
 #regions
 class Region(models.Model):
-    name = models.CharField(max_length=30, blank = False, null = False)
-    view_id  = models.IntegerField(null=True, blank=True)  
+    name       = models.CharField(max_length=30, blank = False, null = False)
+    dictionary = models.TextField(null=True, blank=True)
+    view_id    = models.IntegerField(null=True, blank=True)  
 
     class Meta:
         db_table     = 'ph_regions'
@@ -17,9 +18,10 @@ class Region(models.Model):
 
 #districts
 class District(models.Model):
-    name     = models.CharField(max_length=30, blank = False, null = False)
-    region   = models.ForeignKey(Region, related_name='district', on_delete=models.DO_NOTHING)
-    view_id  = models.IntegerField(null=True, blank=True)  
+    name       = models.CharField(max_length=30, blank = False, null = False)
+    region     = models.ForeignKey(Region, related_name='district', on_delete=models.DO_NOTHING)
+    dictionary = models.TextField(null=True, blank=True)
+    view_id    = models.IntegerField(null=True, blank=True)  
 
     class Meta: 
         db_table = 'ph_districts'
@@ -32,9 +34,10 @@ class District(models.Model):
 
 #wards
 class Ward(models.Model):
-    name     = models.CharField(max_length=30,blank=False, null=False)
-    district = models.ForeignKey(District, related_name='ward',on_delete=models.DO_NOTHING)  
-    view_id  = models.IntegerField(null=True, blank=True)  
+    name       = models.CharField(max_length=30,blank=False, null=False)
+    district   = models.ForeignKey(District, related_name='ward',on_delete=models.DO_NOTHING)  
+    dictionary = models.TextField(null=True, blank=True)
+    view_id    = models.IntegerField(null=True, blank=True)  
 
     class Meta: 
         db_table  =  'ph_wards'
@@ -49,6 +52,7 @@ class Ward(models.Model):
 class Village(models.Model):
     name         = models.CharField(max_length=30, null=False, blank=False)
     ward         = models.ForeignKey(Ward, related_name='village', on_delete=models.DO_NOTHING)
+    dictionary   = models.TextField(null=True, blank=True)
     view_id      = models.IntegerField(null=True, blank=True)  
 
     class Meta:
@@ -64,6 +68,7 @@ class Village(models.Model):
 class Hamlet(models.Model):
     name         = models.CharField(max_length=30, null=False, blank=False)
     village      = models.ForeignKey(Village, related_name='hamlet', on_delete=models.DO_NOTHING)
+    dictionary   = models.TextField(null=True, blank=True)
     view_id      = models.IntegerField(null=True, blank=True)  
 
     class Meta:

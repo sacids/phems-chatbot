@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 from apps.whatsapp import views as whatsapp_views
 from apps.telegram import views as telegram_views
 from apps.api import views as api_views
+from apps.thread.validation import *
 
 urlpatterns = [
     path('', include('apps.account.urls')),
@@ -32,4 +33,9 @@ urlpatterns = [
     path('webhook/facebook', whatsapp_views.facebook),
     path('webhook/telegram', telegram_views.index),
     path('privacy_policy', whatsapp_views.privacy_policy),
+
+    path('api/validation/village', validate_village),
+    path('api/validation/ward', validate_ward),
+
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
