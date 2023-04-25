@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     #apps
     'apps.account',
+    'apps.setup',
     'apps.thread',
     'apps.whatsapp',
     'apps.telegram',

@@ -24,7 +24,8 @@ from apps.api import views as api_views
 urlpatterns = [
     path('', include('apps.account.urls')),
     path('accounts/', include('apps.account.urls')),
-    path('admin', admin.site.urls),
+    path('admin/', admin.site.urls),
+    path('setup/', include('apps.setup.urls')),
     path('threads/', include('apps.thread.urls')),
 
     path('webhook/testing', whatsapp_views.testing),
