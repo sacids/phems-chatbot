@@ -1,7 +1,3 @@
-import random
-import string
-import requests
-import json
 from django.http import JsonResponse
 from apps.setup.models import *
 from apps.thread.models import *
