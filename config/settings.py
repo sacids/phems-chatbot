@@ -144,3 +144,11 @@ MEDIA_URL = "/assets/"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_COOKIE_SECURE = False
+
+# Logging errors in django
+import logging
+
+logging.basicConfig(
+    level = logging.INFO,
+    format = '%(asctime)s %(levelname)s %(message)s',
+    filename = 'info.log',)
