@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <div class="mx-12 py-4 px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto py-2 px-4 sm:px-4 lg:px-4">
             {% if messages %}
             {% for message in messages %}
             <div class="mt-2 alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
@@ -25,58 +25,65 @@
             {% endfor %}
             {% endif %}
 
-            <form method="post" enctype="multipart/form-data" class="w-1/2 text-sm font-medium" autocomplete="off">
-                {% csrf_token %}
+            <div class="w-2/3 mx-auto bg-gray-100 border border-gray-200 rounded-sm px-4 py-4">
+                <form method="post" enctype="multipart/form-data" class="w-full text-xs font-medium text-600 gray mb-2" autocomplete="off">
+                    {% csrf_token %}
 
-                <div class="flex flex-wrap -mx-3 mb-3">
-                    <div class="w-full md:w-full px-3">
-                        {{ form.step|as_crispy_field }}
-                    </div>
-                </div>
+                    <div class="flex flex-wrap mb-2">
+                        <div class="w-full md:w-1/3 pr-2">
+                            {{ form.step|as_crispy_field }}
+                        </div>
 
-                <div class="flex flex-wrap -mx-3 mb-3">
-                    <div class="w-full md:w-full px-3">
-                        {{ form.title|as_crispy_field }}
-                    </div>
-                </div>
+                        <div class="w-full md:w-1/3 pr-2 ">
+                            {{ form.flag|as_crispy_field }}
+                        </div>
 
-                <div class="flex flex-wrap -mx-3 mb-3">
-                    <div class="w-full md:w-1/2 px-3 ">
-                        {{ form.flag|as_crispy_field }}
+                        <div class="w-full md:w-1/3">
+                            {{ form.label|as_crispy_field }}
+                        </div>
                     </div>
 
-                    <div class="w-full md:w-1/2 px-3">
-                        {{ form.label|as_crispy_field }}
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap -mx-3 mb-3">
-                    <div class="w-full md:w-1/4 px-3">
-                        {{ form.pull|as_crispy_field }}
+                    <div class="flex flex-wrap mb-2">
+                        <div class="w-full md:w-full">
+                            {{ form.title|as_crispy_field }}
+                        </div>
                     </div>
 
-                    <div class="w-full md:w-3/4 px-3">
-                        {{ form.url|as_crispy_field }}
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap -mx-3 mb-0">
-                    <div class="w-full md:w-1/4 px-3">
-                        {{ form.action|as_crispy_field }}
+                    <div class="flex flex-wrap mb-2">
+                        <div class="w-full md:w-full">
+                            {{ form.pull_url|as_crispy_field }}
+                        </div>
                     </div>
 
-                    <div class="w-full md:w-3/4 px-3">
-                        {{ form.action_url|as_crispy_field }}
+                    <div class="flex flex-wrap mb-2">
+                        <div class="w-full md:w-1/4 pr-2">
+                            {{ form.verify|as_crispy_field }}
+                        </div>
+
+                        <div class="w-full md:w-3/4">
+                            {{ form.verify_url|as_crispy_field }}
+                        </div>
                     </div>
-                </div>
 
-                <div class="flex items-start">
-                    <a href="{% url 'threads:lists' %}"
-                                class="text-white bg-red-800 hover:bg-red-900 focus:ring-4 font-medium rounded text-sm w-full sm:w-auto px-5 py-2.5 text-center mr-2">Cancel</a>
-                    <button type="submit" class="text-white bg-slate-700 hover:bg-slate-900 focus:ring-4 font-medium rounded text-sm w-full sm:w-auto px-5 py-2.5 text-center">Submit</button>
-                </div>
+                    <div class="flex flex-wrap mb-2">
+                        <div class="w-full md:w-1/4 pr-2">
+                            {{ form.action|as_crispy_field }}
+                        </div>
 
-            </form>
+                        <div class="w-full md:w-3/4">
+                            {{ form.action_url|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <a href="{% url 'threads:lists' %}"
+                            class="text-white bg-red-600 hover:bg-red-700 font-normal rounded text-sm w-full sm:w-auto px-4 py-2 text-center mr-2">Cancel</a>
+                        <button type="submit"
+                            class="text-white bg-slate-600 hover:bg-slate-700 font-normal rounded text-sm w-full sm:w-auto px-4 py-2 text-center">Submit</button>
+                    </div>
+
+                </form>
+            </div>
 
         </div>
     </div>

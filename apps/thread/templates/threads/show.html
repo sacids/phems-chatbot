@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <div class="mx-12 py-4 px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto py-2 px-4 sm:px-4 lg:px-4">
             {% if messages %}
             {% for message in messages %}
             <div class="bg-teal-100 rounded-b text-teal-900 px-4 py-3 mb-4" role="alert">
@@ -26,62 +26,76 @@
             {% endfor %}
             {% endif %}
 
-            <form method="post" enctype="multipart/form-data" class="w-1/3 text-sm font-medium mb-4" autocomplete="off">
-                {% csrf_token %}
-                <input type="hidden" name="thread_id" value="{{thread.id}}" />
+            <div class="flex flex-wrap mb-2">
+                <div class="w-1/3 bg-gray-100 border border-gray-200 rounded-sm px-4 py-4">
+                    <form method="post" enctype="multipart/form-data"
+                        class="w-full text-xs font-medium text-600 gray mb-2" autocomplete="off">
+                        {% csrf_token %}
+                        <input type="hidden" name="thread_id" value="{{thread.id}}" />
 
-                <div class="flex flex-wrap -mx-3 mb-3">
-                    <div class="w-full md:w-full px-3 text-sm font-medium">
-                        <label>View No.</label>
-                        <input type="number" name="view_id" id="view_id"
-                            class="w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal"
-                            placeholder="Write view number..." min="1" required />
-                    </div>
+                        <div class="flex flex-wrap -mx-3 mb-3">
+                            <div class="w-full md:w-full px-3 text-sm font-medium">
+                                <label>View No.</label>
+                                <input type="number" name="view_id" id="view_id"
+                                    class="w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal"
+                                    placeholder="Write view number..." min="1" required />
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap -mx-3 mb-0">
+                            <div class="w-full md:w-full px-3 text-sm font-medium">
+                                <label>Sub Thread Title </label>
+                                <textarea name="sub_thread" id="sub_thread"
+                                    class="w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal"
+                                    placeholder="Write sub thread title" rows="3" required></textarea>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <button type="submit"
+                            class="text-white bg-slate-600 hover:bg-slate-700 font-normal rounded text-sm w-full sm:w-auto px-4 py-2 text-center">Submit</button>
+                        </div>
+                    </form>
                 </div>
 
-                <div class="flex flex-wrap -mx-3 mb-0">
-                    <div class="w-full md:w-full px-3 text-sm font-medium">
-                        <label>Sub Thread Title </label>
-                        <textarea name="sub_thread" id="sub_thread"
-                            class="w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal"
-                            placeholder="Write sub thread title" rows="3" required></textarea>
-                    </div>
+                <div class="w-2/3  px-4 py-0">
+                    <table class="w-full">
+                        <thead class="bg-gray-100 border">
+                            <tr>
+                                <th width="10%" class="border-r text-sm  font-medium text-gray-900 px-2 py-2 text-left">
+                                    View
+                                    No.</th>
+                                <th width="80%" class="border-r text-sm  font-medium text-gray-900 px-2 py-2 text-left">
+                                    Sub
+                                    Thread Title</th>
+                                <th style="width: 40px;"
+                                    class="border-r text-sm  font-medium text-gray-900 px-2 py-2 text-left">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="overflow-y-scroll bg-white border text-gray-600 text-sm font-normal">
+                            {% for val in sub_threads %}
+                            <tr class="border-b">
+                                <td class="border-r px-2 py-2">{{val.view_id}}</td>
+                                <td class="border-r px-2 py-2">{{ val.title }}</td>
+                                <td class="px-2 py-2 font-medium text-gray-700 flex flex-row">
+                                    <a href="{% url 'threads:delete-sub' val.id %}" class="">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                        </svg>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-
-                <div class="flex items-start">
-                    <button type="submit"
-                        class="text-white bg-slate-700 hover:bg-slate-900 focus:ring-4 font-medium rounded text-sm w-full sm:w-auto px-5 py-2.5 text-center">Submit</button>
-                </div>
-            </form>
+            </div>
 
 
-            <table class="min-w-full">
-                <thead class="bg-gray-100 border">
-                    <tr>
-                        <th width="10%" class="border-r text-sm  font-medium text-gray-900 px-2 py-2 text-left">View No.</th>
-                        <th width="80%" class="border-r text-sm  font-medium text-gray-900 px-2 py-2 text-left">Sub Thread Title</th>
-                        <th style="width: 40px;" class="border-r text-sm  font-medium text-gray-900 px-2 py-2 text-left">Action</th>
-                    </tr>
-                </thead>
 
-                <tbody class="overflow-y-scroll bg-white border text-gray-600 text-sm font-normal">
-                    {% for val in sub_threads %}
-                    <tr class="border-b">
-                        <td class="border-r px-2 py-2">{{val.view_id}}</td>
-                        <td class="border-r px-2 py-2">{{ val.title }}</td>
-                        <td class="px-2 py-2 font-medium text-gray-700 flex flex-row">
-                            <a href="{% url 'threads:delete-sub' val.id %}" class="">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                </svg>
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
         </div>
     </div>
 </main>

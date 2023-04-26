@@ -22,8 +22,9 @@ class ThreadForm(forms.ModelForm):
             'step': forms.TextInput(attrs={'class': 'w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal', 'id': 'flag', 'placeholder': 'Write step...', 'required': '' }),
             'flag': forms.TextInput(attrs={'class': 'w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal', 'id': 'flag', 'placeholder': 'Write flag...', 'required': '' }),
             'label': forms.TextInput(attrs={'class': 'w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal', 'id': 'label', 'placeholder': 'Write label...', 'required': '' }),
-            'pull': forms.NumberInput(attrs={'class': 'w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal', 'id': 'pull', 'placeholder': 'pull...', 'required': '' }),
-            'url': forms.TextInput(attrs={'class': 'w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal', 'id': 'url', 'placeholder': 'Write pull url...', }),
+            'pull_url': forms.TextInput(attrs={'class': 'w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal', 'id': 'url', 'placeholder': 'Write pull url...', }),
+            'verify': forms.TextInput(attrs={'class': 'w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal', 'id': 'verify', 'placeholder': 'Validate...' }),
+            'verify_url': forms.TextInput(attrs={'class': 'w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal', 'id': 'verify_url', 'placeholder': 'Write validation url...', }),
             'action': forms.Select(attrs={'class': 'w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal', 'id': 'action', 'placeholder': 'action...' }),
             'action_url': forms.TextInput(attrs={'class': 'w-full bg-white text-gray-600 border border-gray-300 rounded py-3 px-4 mb-3 my-1 leading-tight focus:outline-none focus:bg-white focus:border-gray-600 text-sm font-normal', 'id': 'action', 'placeholder': 'Write action url...', }),
         } 
@@ -33,8 +34,9 @@ class ThreadForm(forms.ModelForm):
             'step': 'Step',
             'flag': 'Flag',
             'label': 'Label',
-            'pull': 'Pull',
-            'url': 'Pull URL',
+            'pull_url': 'Pull URL',
+            'verify': 'Validation',
+            'verify_url': 'Validation URL',
             'action': 'Action',
             'action_url': 'Action URL',
         }      
