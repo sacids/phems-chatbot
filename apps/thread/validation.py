@@ -20,7 +20,7 @@ def validate_village(request):
             return JsonResponse({'error': True, 'validation': False, 'data': 'WARD_MENU', 'value': village[0].name})
     else:
         """Invalid input"""
-        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Kijiji ukichoingiza hakipo, tafadhali rudia.'})
+        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Umekosea kijiji/mtaa, tafadhali rudia.'})
 
         
 def validate_ward(request):
@@ -48,7 +48,7 @@ def validate_ward(request):
             pass
     else:
         """Invalid input"""
-        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Kata uliyoingiza haipo, tafadhali rudia.'})
+        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Umekosea kata, tafadhali rudia.'})
     
 
 def validate_date(request):
@@ -81,7 +81,7 @@ def validate_date(request):
             return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Tarehe ya tukio isizidi tarehe ya leo, tafadhali rudia.'})
     else:
         """Invalid input"""
-        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Umekosea kuingiza tarehe, tafadhali rudia. mfano 26/04/2023'})
+        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Umekosea tarehe, tafadhali rudia. mfano 26/04/2023'})
 
 
 
