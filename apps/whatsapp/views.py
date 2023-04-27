@@ -9,6 +9,7 @@ from .classes import WhatsAppWrapper
 from apps.thread.classes import ThreadWrapper
 from apps.thread.models import *
 from decouple import config
+import logging
 
 VERIFY_TOKEN = config('WHATSAPP_VERIFY_TOKEN')
 API_URL = "https://graph.facebook.com/v15.0/"
@@ -98,9 +99,7 @@ def facebook(request):
                 """get image data"""
                 image_id, mime_type = image["id"], image["mime_type"]
                 image_url = wrapper.query_media_url(image_id)
-  
-                print("image URL")
-                print(image_url)
+                logging.info(image_url)
 
                 """TODO: save image to a folder"""
 
@@ -170,6 +169,7 @@ def process_threads(**kwargs):
                     if(data['action'] is not None):
                         """process data"""
                         my_data = wrapper.process_data(uuid=OD_uuid)
+                        logging.info(my_data)
 
                         if data['action'] == 'PUSH':
                             """update and end thread session"""
@@ -197,6 +197,7 @@ def process_threads(**kwargs):
 
                     """process data"""
                     my_data = wrapper.process_data(uuid=OD_uuid)
+                    logging.info(my_data)
 
                     if thread.action == 'PUSH':
                         """push data"""
@@ -222,7 +223,7 @@ def push_data(**kwargs):
 
     """push data"""
     response = requests.post(f"{actionURL}", data = json.dumps(payload), headers={"Content-Type": "application/json; charset=utf-8"})
-    print(response.json())
+    logging.info(response.json())
         
     """response"""
     return JsonResponse({'status': 'success', 'message': "data sent"})
