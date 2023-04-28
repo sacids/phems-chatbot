@@ -142,7 +142,7 @@ def process_threads(**kwargs):
             """initiate thread session"""
             message = wrapper.init_thread(phone=from_number, channel="TELEGRAM") 
         else:
-            message = "Ripoti taarifa za matukio kwa MAAFA Chatbot kwa kutuma neno TAARIFA au TUKIO au MAAFA"   
+            message = "Karibu kituo cha Taifa cha Operesheni na Mawasiliano ya Dharura, andika/tuma neno TAARIFA, TUKIO au MAAFA."   
 
     """return message"""
     return message
