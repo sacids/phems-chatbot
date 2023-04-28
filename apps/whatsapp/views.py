@@ -104,7 +104,13 @@ def facebook(request):
                 """TODO: save image to a folder"""
 
                 """process thread"""
-                new_message = process_threads(from_number=from_number, key=image_url)
+                new_message = process_threads(from_number=from_number, key="image_url")
+
+                """send message"""
+                response = wrapper.send_text_message(from_number, new_message)
+            elif message_type == 'document':
+                """process thread"""
+                new_message = process_threads(from_number=from_number, key="document_url")
 
                 """send message"""
                 response = wrapper.send_text_message(from_number, new_message)
