@@ -48,7 +48,7 @@ def validate_ward(request):
             pass
     else:
         """Invalid input"""
-        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Pole, umekosea kata, kwa sasa huduma inapatikana kata ya Jangwani, Kipawa, Vingunguti na Mnyiamani.'})
+        return JsonResponse({'error': True, 'validation': False, 'data': 'INVALID_INPUT', 'message': 'Pole, umekosea kata, kwa sasa huduma inapatikana kata ya Jangwani, Kipawa, Vingunguti na Mnyamani.'})
     
 
 def validate_date(request):
