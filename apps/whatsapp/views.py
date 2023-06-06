@@ -140,7 +140,7 @@ def process_threads(**kwargs):
     thread_session = ThreadSession.objects.filter(phone=from_number, active=0) 
 
     if thread_session.count() > 0:
-        if key.upper() == "TAARIFA" or key.upper() == "TUKIO" or key.upper() == "MAAFA":
+        if key.upper() == "TAARIFA" or key.upper() == "TUKIO":
             """update all menu sessions"""
             ThreadSession.objects.filter(phone=from_number).update(active=1)
 
@@ -212,11 +212,11 @@ def process_threads(**kwargs):
                 """initiate thread session"""
                 message = "Asante kwa kuripoti taarifa, tunazichambua taarifa zako na kuzifanyia kazi." 
     else:
-        if key.upper() == "TAARIFA" or key.upper() == "TUKIO" or key.upper() == "MAAFA":
+        if key.upper() == "TAARIFA" or key.upper() == "TUKIO":
             """initiate thread session"""
             message = wrapper.init_thread(phone=from_number, channel="WHATSAPP") 
         else:
-            message = "Karibu kituo cha Taifa cha Operesheni na Mawasiliano ya Dharura, andika/tuma neno TAARIFA, TUKIO au MAAFA."
+            message = "Karibu kituo cha Taifa cha Operesheni na Mawasiliano ya Dharura, andika/tuma neno TAARIFA, TUKIO."
 
     """return message"""
     return message
